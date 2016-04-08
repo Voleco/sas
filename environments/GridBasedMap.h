@@ -73,4 +73,15 @@ private:
 	unsigned int maxY;
 };
 
+class GridBasedMapHeuristic
+{
+public:
+	GridBasedMapHeuristic() { }
+	~GridBasedMapHeuristic() {}
+	void SetGoal(GridBasedMapState& s) { goal = s; }
+	int GetHCost(GridBasedMapState& s);
+	GridBasedMapState goal;
+};
+
+
 #endif // !GRID_BASED_MAP_H

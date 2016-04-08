@@ -11,7 +11,7 @@ template <typename state, typename action, typename environment, typename heuris
 class MyIDAStar :public MySearchAlgorithm<state, action, environment>
 {
 public:
-	MyIDAStar(environment &e, state& start, state& goal, heuristic& h, unsigned int md)
+	MyIDAStar(environment &e, state& start, state& goal, heuristic& h, int md)
 		:MySearchAlgorithm<state, action, environment>(e, start, goal), nodesExpanded(0), maxFAllowed(md), heur(h),nextF(-1)
 	{
 	}
@@ -21,7 +21,7 @@ public:
 	std::vector<action> GetActionSequence();
 protected:
 	uint64_t nodesExpanded;
-	unsigned int maxFAllowed;
+	int maxFAllowed;
 	heuristic heur;
 	int nextF;
 	std::stack<action> actionSequence;
@@ -31,7 +31,7 @@ protected:
 template <typename state, typename action, typename environment, typename heuristic>
 bool MyIDAStar<state, action, environment, heuristic>::GetPath(environment &e, state &start, state &goal)
 {
-	nextF = heur.GetHCost(start);
+	nextF = -1;
 	while(!actionSequence.empty())
 		actionSequence.pop();
 	nodesExpanded = 0;
@@ -41,6 +41,7 @@ bool MyIDAStar<state, action, environment, heuristic>::GetPath(environment &e, s
 		if (GetPathWithinF(e, start, goal, nextF,0))
 			return true;
 	}
+	return false;
 }
 
 template <typename state, typename action, typename environment, typename heuristic>

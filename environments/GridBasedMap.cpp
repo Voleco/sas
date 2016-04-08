@@ -84,3 +84,12 @@ unsigned int GridBasedMap::GetSolutionDepthUpperBound(GridBasedMapState & s, Gri
 {
 	return (g.coorX + g.coorY)>(maxX+maxY)?(maxX+maxY):(g.coorX+g.coorY);
 }
+
+int GridBasedMapHeuristic::GetHCost(GridBasedMapState& s)
+{
+	int xdiff = 0;
+	int ydiff = 0;
+	xdiff = s.coorX > goal.coorX ? (s.coorX - goal.coorX) : (goal.coorX - s.coorX);
+	ydiff = s.coorY > goal.coorY ? (s.coorY - goal.coorY) : (goal.coorY - s.coorY);
+	return xdiff + ydiff;
+}

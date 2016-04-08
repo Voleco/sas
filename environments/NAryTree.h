@@ -28,4 +28,15 @@ private:
 	unsigned int dep;
 };
 
+class NAryTreeHeuristic
+{
+public:
+	NAryTreeHeuristic() { }
+	~NAryTreeHeuristic() {}
+	void SetGoal(NAryTreeState& s) { goal = s; }
+	int GetHCost(NAryTreeState& s) { return 0; }
+	NAryTreeState goal;
+};
+
+
 #endif // !N_ARY_TREE
