@@ -37,7 +37,7 @@ bool MyIDAStar<state, action, environment, heuristic>::GetPath(environment &e, s
 	nodesExpanded = 0;
 	while (nextF < maxFAllowed)
 	{
-		std::cout << "nextF" << nextF << "\n";
+		//std::cout << "nextF" << nextF << "\n";
 		if (GetPathWithinF(e, start, goal, nextF,0))
 			return true;
 	}
@@ -57,7 +57,9 @@ bool MyIDAStar<state, action, environment, heuristic>::GetPathWithinF(environmen
 			nextF = fcost;
 		else if (nextF > f&&fcost < nextF)
 				nextF = fcost;
-		//std::cout << "updated nextF to: " << nextF << "\n";
+		//std::cout << "fcost: " << fcost << "\n";
+		//std::cout << "f: " << f << "\n";
+		//std::cout << "nextF: " << nextF << "\n";
 		return false;
 	}
 	if (start == goal)

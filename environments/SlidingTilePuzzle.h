@@ -3,6 +3,7 @@
 #define SLIDING_TILE_PUZZLE_H
 
 #include <iostream>
+#include <stack>
 #include "MyEnvironment.h"
 
 #define Right 0
@@ -86,15 +87,15 @@ public:
 class SlidingTilePuzzle : public MyEnvironment<SlidingTilePuzzleState, SlidingTilePuzzleAction> 
 {
 public:
-	SlidingTilePuzzle() {}
-	SlidingTilePuzzle(unsigned int w, unsigned int h) {}
+	SlidingTilePuzzle() { historyActions.push(-1); }
+	SlidingTilePuzzle(unsigned int w, unsigned int h) { historyActions.push(-1); }
 	~SlidingTilePuzzle() {}
 
 	void GetActions(SlidingTilePuzzleState &nodeID, std::vector<SlidingTilePuzzleAction> &actions);
 	void ApplyAction(SlidingTilePuzzleState &s, SlidingTilePuzzleAction a);
 	void UndoAction(SlidingTilePuzzleState &s, SlidingTilePuzzleAction a);
 
-
+	std::stack<char> historyActions;
 };
 
 

@@ -2,6 +2,7 @@
 #include <iostream>
 #include <vector>
 #include <time.h>
+#include <cstring>
 #include "MyIDAStar.h"
 #include "SlidingTilePuzzle.h"
 
@@ -9,6 +10,16 @@ void GetSildingTileInstance(int index, SlidingTilePuzzleState& s);
 
 int main(int argc,char** argv)
 {
+	bool showPath = false;
+	int low = 1;
+	int high = 100;
+	if (argc > 1 && strcmp(argv[1], "-showpath") == 0)
+		showPath = true;
+	if (argc > 3)
+	{
+		low = atoi(argv[2]);
+		high = atoi(argv[3]);
+	}
 	SlidingTilePuzzle puzzle(4, 4);
 	SlidingTilePuzzleState start(4, 4);
 	SlidingTilePuzzleState goal(4, 4);
@@ -24,27 +35,33 @@ int main(int argc,char** argv)
 	clock_t endTime;
 	clock_t clockTicksTaken;
 	double timeInSeconds;
-	for (int i = 0; i < 11; i++)
+	//int i = atoi(argv[1]);
+	for (int i = low-1; i < high; i++)
 	{
 		startTime = clock();
 		GetSildingTileInstance(i, start);
 		ida = new MyIDAStar<SlidingTilePuzzleState, SlidingTilePuzzleAction, SlidingTilePuzzle, ManhattanDistanceHeuristic>(puzzle, start, goal, heur, 500);
 		std::cout << "*********************\n"
-			<<"puzzle "<<i-9<<"\n"
+			<<"puzzle "<<i+1<<"\n"
 			<< "start: " << start
 			<< "goal: " << goal << "\n";
 		std::vector<SlidingTilePuzzleAction> acs;
 		if (ida->GetPath(puzzle, start, goal))
 		{
-			std::cout << "ida found a path!\n";
+			std::cout << "IDA* found a path!\n";
 			acs = ida->GetActionSequence();
-			std::cout << "path length"<<acs.size() << "\n";
-			//for (int i = 0; i < acs.size(); i++)
-			//	std::cout << acs[i] << "\n";
+			std::cout << "Path length: "<<acs.size() << "\n";
+			if (showPath)
+			{
+				std::cout << "Path: ";
+				for (int i = 0; i < acs.size(); i++)
+					std::cout << acs[i] << " ";
+				std::cout << "\n";
+			}
 		}
 
 		else
-			std::cout << "ida did not find a path.\n";
+			std::cout << "IDA* did not find a path.\n";
 		std::cout << "nodes expanded: " << ida->GetNodesExpanded() << "\n";
 
 		delete ida;
@@ -56,28 +73,13 @@ int main(int argc,char** argv)
 	}
 
 
-
-
-
 	return 0;
 }
 
 void GetSildingTileInstance(int index, SlidingTilePuzzleState& s)
 {
-	int instances[110][16] =
+	int instances[100][16] =
 	{ 
-
-		{ 4, 1, 2, 3, 9, 8, 6, 7, 12, 5, 10, 11, 13, 0, 14, 15 },
-		{ 4, 1, 2, 3, 5, 6, 10, 7, 8, 9, 14, 11, 12, 0, 13, 15 },
-		{ 4, 1, 2, 3, 8, 0, 6, 7, 9, 5, 10, 11, 12, 13, 14, 15 },
-		{ 1, 2, 6, 3, 4, 5, 10, 7, 8, 9, 11, 15, 12, 13, 14, 0 },
-		{ 4, 1, 2, 3, 8, 0, 6, 7, 9, 5, 10, 11, 12, 13, 14, 15 },
-		{ 5, 4, 2, 3, 1, 0, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 },
-		{ 1, 2, 3, 7, 4, 5, 6, 11, 8, 9, 14, 10, 12, 0, 13, 15 },
-		{ 4, 1, 2, 3, 5, 6, 7, 0, 8, 9, 10, 11, 12, 13, 14, 15 },
-		{ 4, 1, 2, 3, 5, 6, 7, 0, 8, 9, 10, 11, 12, 13, 14, 15 },
-		{ 1, 5, 2, 3, 4, 9, 6, 7, 0, 13, 10, 11, 8, 12, 14, 15 },
-
 	{ 14, 13, 15, 7, 11, 12, 9, 5, 6, 0, 2, 1, 4, 8, 10, 3 },
 	{ 13, 5, 4, 10, 9, 12, 8, 14, 2, 3, 7, 1, 0, 15, 11, 6 },
 	{ 14, 7, 8, 2, 13, 11, 10, 4, 9, 12, 5, 0, 3, 6, 1, 15 },
