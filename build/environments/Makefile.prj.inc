@@ -32,4 +32,5 @@ default : all
 SRC_CPP = \
 	environments/NAryTree.cpp \
 	environments/GridBasedMap.cpp \
+	environments/SlidingTilePuzzle.cpp \
 

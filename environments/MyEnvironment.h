@@ -10,8 +10,6 @@ public:
 	virtual void GetActions(state &nodeID, std::vector<action> &actions) = 0;
 	virtual void ApplyAction(state &s, action a) = 0;
 	virtual void UndoAction(state &s, action a) = 0;
-	virtual unsigned int GetDepth(state &s) = 0;
-	virtual unsigned int GetSolutionDepthUpperBound(state &s, state &g)=0;
 };
 
 
