@@ -12,13 +12,15 @@
 PROJECTS = \
   environments \
   apps/asg2 \
+  apps/asg2test \
 
 
 # Include projects with broken compilation
 PROJECTS_ALL = \
   environments \
   apps/asg2 \
-
+  apps/asg2test \
+  
 # sequentially to avoid same sub-target in sub-make invoked twice
 default:
 	$(MAKE) debug
