@@ -11,16 +11,12 @@
 # All projects to build in this order.
 PROJECTS = \
   environments \
-  apps/asg1 \
-  apps/asg1test \
   apps/asg2 \
 
 
 # Include projects with broken compilation
 PROJECTS_ALL = \
   environments \
-  apps/asg1 \
-  apps/asg1test \
   apps/asg2 \
 
 # sequentially to avoid same sub-target in sub-make invoked twice
