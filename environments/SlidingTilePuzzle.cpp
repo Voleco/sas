@@ -108,3 +108,58 @@ void SlidingTilePuzzle::UndoAction(SlidingTilePuzzleState& s, SlidingTilePuzzleA
 	historyActions.pop();
 	//std::cout << "state undid actions:\n" << s;
 }
+
+void SlidingTilePuzzle::GetRankFromState(const SlidingTilePuzzleState& state, uint64_t& rank)
+{
+	//make a copy of the state
+	SlidingTilePuzzleState Pi(state);
+	int size = width*height;
+	//caculate Pi^-1
+	std::vector<int> dual;
+	dual.resize(size);
+	for (int i = 0; i < size; i++)
+	{
+		dual[Pi.puzzle[i]] = i;
+	}
+	rank = 0;
+	int s = 0;
+	int tmp = 0;
+	for (int n = size; n > 0; n--)
+	{
+		s = Pi.puzzle[n - 1];
+		//swap Pi[n-1], Pi[Pi^-1[n-1]]
+		tmp = Pi.puzzle[n - 1];
+		Pi.puzzle[n - 1] = Pi.puzzle[dual[n - 1]];
+		Pi.puzzle[dual[n - 1]] = tmp;
+		//swap Pi^-1[s], Pi^-1[n-1]
+		tmp = dual[s];
+		dual[s] = dual[n - 1];
+		dual[n - 1] = tmp;
+
+		rank += s*Factorial(n - 1);
+	}
+
+}
+
+void SlidingTilePuzzle::GetStateFromRank(SlidingTilePuzzleState& state, const uint64_t& rank)
+{
+	state = SlidingTilePuzzleState(width, height);
+	state.Reset();
+	int s = 0;
+	uint64_t r = rank;
+	for (int n = width*height ; n > 0; n--)
+	{
+		s = r / Factorial(n-1);
+		r = r % Factorial(n-1);
+		//swap state.puzzle[index] with state.puzzle[n-1]
+		int tmp = state.puzzle[n-1];
+		state.puzzle[n - 1] = state.puzzle[s];
+		state.puzzle[s] = tmp;
+	}
+	for (int i = 0; i < width*height;i++)
+		if (state.puzzle[i] == 0)
+		{
+			state.blankIdx = i;
+			break;
+		}
+}

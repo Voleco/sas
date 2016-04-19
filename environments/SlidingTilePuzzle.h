@@ -16,6 +16,15 @@ class SlidingTilePuzzleState
 public:
 	SlidingTilePuzzleState() {}
 	SlidingTilePuzzleState(unsigned int x, unsigned int y) :width(x), height(y) { Reset(); }
+	SlidingTilePuzzleState(const SlidingTilePuzzleState& s)
+	{
+		width = s.width;
+		height = s.height;
+		puzzle.resize(s.puzzle.size());
+		for (int i = 0; i < puzzle.size(); i++)
+			puzzle[i] = s.puzzle[i];
+		blankIdx = s.blankIdx;
+	}
 	void Reset() 
 	{ 
 		puzzle.resize(0);
@@ -88,14 +97,31 @@ class SlidingTilePuzzle : public MyEnvironment<SlidingTilePuzzleState, SlidingTi
 {
 public:
 	SlidingTilePuzzle() { historyActions.push(-1); }
-	SlidingTilePuzzle(unsigned int w, unsigned int h) { historyActions.push(-1); }
+	SlidingTilePuzzle(unsigned int w, unsigned int h):width(w),height(h) { historyActions.push(-1); }
 	~SlidingTilePuzzle() {}
 
 	void GetActions(SlidingTilePuzzleState &nodeID, std::vector<SlidingTilePuzzleAction> &actions);
 	void ApplyAction(SlidingTilePuzzleState &s, SlidingTilePuzzleAction a);
 	void UndoAction(SlidingTilePuzzleState &s, SlidingTilePuzzleAction a);
 
-	std::stack<char> historyActions;
+	uint64_t Factorial(int val)
+	{
+		static uint64_t table[21] =
+		{ 1ll, 1ll, 2ll, 6ll, 24ll, 120ll, 720ll, 5040ll, 40320ll, 362880ll, 3628800ll, 39916800ll, 479001600ll,
+			6227020800ll, 87178291200ll, 1307674368000ll, 20922789888000ll, 355687428096000ll,
+			6402373705728000ll, 121645100408832000ll, 2432902008176640000ll };
+		if (val > 20)
+			return (uint64_t)-1;
+		return table[val];
+	}
+
+
+	void GetRankFromState(const SlidingTilePuzzleState& state, uint64_t& rank);
+	void GetStateFromRank(SlidingTilePuzzleState& state, const uint64_t& rank);
+	std::stack<SlidingTilePuzzleAction> historyActions;
+	unsigned int width;
+	unsigned int height;
+
 };
 
 
