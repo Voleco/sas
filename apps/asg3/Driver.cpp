@@ -22,9 +22,34 @@ int main(int argc,char** argv)
 		std::cout << "origin state: " << start << "\n";
 		puzzle.GetRankFromState(start, rank);
 		std::cout << "rank: " << rank << "\n";
-		puzzle.GetStateFromRank(start, rank);
-		std::cout << "retrieved state: " << start << "\n";
+		SlidingTilePuzzleState goal(4, 4);
+		puzzle.GetStateFromRank(goal, rank);
+		std::cout << "retrieved state: " << goal << "\n";
 	}
+
+	if (strcmp(argv[1], "-test2") == 0)
+	{
+		uint64_t rank;
+		SlidingTilePuzzleState start(4, 4);
+		SlidingTilePuzzleState goal(4, 4);
+		goal.Reset();
+		int i = atoi(argv[2]);
+		GetSildingTileInstance(i, start);
+
+		SlidingTilePuzzle* puzzle = new SlidingTilePuzzle(4, 4);
+
+		std::vector<int> pattern;
+		for (int i = 0; i < 7; i++)
+			pattern.push_back(i);
+		SlidingTilePuzzlePDB* pdb = new SlidingTilePuzzlePDB(puzzle, goal, pattern);
+
+		std::cout << "origin state: " << start << "\n";
+		pdb->GetPDBRankFromState(start, rank);
+		std::cout << "rank: " << rank << "\n";
+		pdb->GetStateFromPDBRank(goal, rank);
+		std::cout << "retrieved state: " << goal << "\n";
+	}
+
 	else
 	{
 		std::cout << "Usage: " << argv[0] << " -stp [low] [high] [-showpath]\n"

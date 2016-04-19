@@ -124,5 +124,26 @@ public:
 
 };
 
+class SlidingTilePuzzlePDB
+{
+public:
+	SlidingTilePuzzlePDB(SlidingTilePuzzle* env, SlidingTilePuzzleState &s, std::vector<int> p);
+	uint64_t GetPDBSize() const { return pdbSize; }
+
+	void GetAbstractState(const SlidingTilePuzzleState& state, SlidingTilePuzzleState& abstate);
+	void GetPDBRankFromState(const SlidingTilePuzzleState& state, uint64_t& rank);
+	void GetStateFromPDBRank(SlidingTilePuzzleState& state, const uint64_t& rank);
+
+	//void BuildPDB();
+	//void Save(const char* hprefix);
+	//void Load(const char* hprefix);
+
+	uint64_t FactorialN_K(int n, int k);
+
+
+	std::vector<int> pattern;
+	uint64_t pdbSize;
+};
+
 
 #endif

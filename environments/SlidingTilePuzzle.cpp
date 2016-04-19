@@ -109,6 +109,53 @@ void SlidingTilePuzzle::UndoAction(SlidingTilePuzzleState& s, SlidingTilePuzzleA
 	//std::cout << "state undid actions:\n" << s;
 }
 
+//Lexicographical ranking
+void SlidingTilePuzzle::GetRankFromState(const SlidingTilePuzzleState& state, uint64_t& rank)
+{
+	int size = state.width*state.height;
+	rank = 0;
+	int s = 0;
+	for (int i = 0; i < size; i++)
+	{
+		s = 0;
+		for (int j = i + 1; j < size; j++)
+			if (state.puzzle[j] < state.puzzle[i])
+				s++;
+
+		rank += s*Factorial(size - 1 - i);
+	}
+
+}
+void SlidingTilePuzzle::GetStateFromRank(SlidingTilePuzzleState& state, const uint64_t& rank)
+{
+	state = SlidingTilePuzzleState(width, height);
+	state.Reset();
+	int size = width*height;
+	std::vector<int> pz;
+	for (int i = 0; i < size; i++)
+		pz.push_back(i);
+	uint64_t countRight = 0;
+	uint64_t r = rank;
+	for (int i = 0; i < size; i++)
+	{
+		countRight = r / Factorial(size - 1 - i);
+		r = r%Factorial(size - 1 - i);
+		state.puzzle[i] = pz[countRight];
+		pz.erase(pz.begin() + countRight);
+	}
+
+	for (int i = 0; i < size; i++)
+	{
+		if (state.puzzle[i] == 0)
+		{
+			state.blankIdx = i;
+			return;
+		}
+	}
+}
+
+// Myrvold/Ruskey linear-time method
+/*
 void SlidingTilePuzzle::GetRankFromState(const SlidingTilePuzzleState& state, uint64_t& rank)
 {
 	//make a copy of the state
@@ -140,7 +187,6 @@ void SlidingTilePuzzle::GetRankFromState(const SlidingTilePuzzleState& state, ui
 	}
 
 }
-
 void SlidingTilePuzzle::GetStateFromRank(SlidingTilePuzzleState& state, const uint64_t& rank)
 {
 	state = SlidingTilePuzzleState(width, height);
@@ -162,4 +208,75 @@ void SlidingTilePuzzle::GetStateFromRank(SlidingTilePuzzleState& state, const ui
 			state.blankIdx = i;
 			break;
 		}
+}
+*/
+
+SlidingTilePuzzlePDB::SlidingTilePuzzlePDB(SlidingTilePuzzle* env, SlidingTilePuzzleState &s, std::vector<int> p)
+	:pattern(p),pdbSize(0)
+{
+	pdbSize = FactorialN_K(s.puzzle.size(), s.puzzle.size() - pattern.size());
+}
+
+uint64_t SlidingTilePuzzlePDB::FactorialN_K(int n, int k)
+{
+	uint64_t value = 1;
+
+	for (int i = n; i > k; i--)
+	{
+		value *= i;
+	}
+
+	return value;
+}
+
+void SlidingTilePuzzlePDB::GetPDBRankFromState(const SlidingTilePuzzleState& state, uint64_t& rank)
+{
+	int size = pattern.size();
+	int K = state.puzzle.size() - size;
+	std::vector<int> copy;
+	for (int i = 0; i < state.puzzle.size(); i++)
+		copy.push_back(-1);
+	for (int i = 0; i < pattern.size(); i++)
+		for (int i2 = 0; i2 < state.puzzle.size(); i2++)
+			if (state.puzzle[i2] == pattern[i])
+				copy[i2] = state.puzzle[i2];
+
+	rank = 0;
+	int j = 0;
+	for (int i = 0; i < size; i++)
+	{
+		j = 0;
+		for (j = 0; j < copy.size(); j++)
+		{
+			if (copy[j] == pattern[i])
+				break;
+		}
+
+		rank += j * FactorialN_K(copy.size()-1,K);
+
+		copy.erase(copy.begin() + j);
+	}
+}
+
+void SlidingTilePuzzlePDB::GetStateFromPDBRank(SlidingTilePuzzleState& state, const uint64_t& rank)
+{
+	int K = state.puzzle.size() - pattern.size();
+	uint64_t r = rank;
+	int count = 0;
+	int index = 0;
+	for (int i = 0; i < state.puzzle.size(); i++)
+		state.puzzle[i] = -1;
+	for (int i = 0; i < pattern.size(); i++)
+	{
+		count = r / FactorialN_K(state.puzzle.size() - 1 - i, K);
+		r = r % FactorialN_K(state.puzzle.size() - 1 - i, K);
+		index = 0;
+		while (count > 0) 
+		{
+			if (state.puzzle[index] == -1)
+				count--;
+			index++;
+		}
+		state.puzzle[index] = pattern[i];
+	}
 }
