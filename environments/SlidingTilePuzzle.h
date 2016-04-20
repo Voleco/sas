@@ -5,6 +5,7 @@
 #include <iostream>
 #include <string>
 #include <stack>
+#include <queue>
 #include "MyEnvironment.h"
 
 #define Right 0
@@ -131,11 +132,11 @@ public:
 	SlidingTilePuzzlePDB(SlidingTilePuzzle* e, SlidingTilePuzzleState &s, std::vector<int> p);
 	uint64_t GetPDBSize() const { return pdbSize; }
 
-	void GetAbstractState(const SlidingTilePuzzleState& state, SlidingTilePuzzleState& abstate);
+	//void GetAbstractState(const SlidingTilePuzzleState& state, SlidingTilePuzzleState& abstate);
 	void GetPDBRankFromState(const SlidingTilePuzzleState& state, uint64_t& rank);
 	void GetStateFromPDBRank(SlidingTilePuzzleState& state, const uint64_t& rank);
 
-	//void BuildPDB();
+	void BuildPDB();
 
 	std::string GetFileName(const char *prefix);
 	void Save(const char* prefix);
@@ -148,6 +149,7 @@ public:
 	SlidingTilePuzzleState goalState;
 	std::vector<int> pattern;
 	uint64_t pdbSize;
+	std::vector<uint8_t> pdbData;
 };
 
 

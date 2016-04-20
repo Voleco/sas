@@ -49,8 +49,11 @@ int main(int argc,char** argv)
 		pdb->GetStateFromPDBRank(goal, rank);
 		std::cout << "retrieved state: " << goal << "\n";
 
-		pdb->Save(argv[3]);
-		pdb->Load(argv[3]);
+		if (!pdb->Load(argv[3]))
+		{
+			pdb->BuildPDB();
+			pdb->Save(argv[3]);
+		}		
 	}
 
 	else

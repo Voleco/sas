@@ -214,10 +214,11 @@ void SlidingTilePuzzle::GetStateFromRank(SlidingTilePuzzleState& state, const ui
 SlidingTilePuzzlePDB::SlidingTilePuzzlePDB(SlidingTilePuzzle* e, SlidingTilePuzzleState &s, std::vector<int> p)
 	:env(e),pattern(p),pdbSize(0),goalState(s)
 {
-	pdbSize = FactorialN_K(s.puzzle.size(), s.puzzle.size() - pattern.size());
 	uint64_t r;
 	GetPDBRankFromState(s, r);
 	GetStateFromPDBRank(goalState, r);
+	pdbSize = FactorialN_K(s.puzzle.size(), s.puzzle.size() - pattern.size());
+	pdbData = std::vector<uint8_t>(pdbSize, 255);
 }
 
 uint64_t SlidingTilePuzzlePDB::FactorialN_K(int n, int k)
@@ -293,6 +294,51 @@ void SlidingTilePuzzlePDB::GetStateFromPDBRank(SlidingTilePuzzleState& state, co
 
 }
 
+void SlidingTilePuzzlePDB::BuildPDB()
+{
+	uint64_t rank;
+	GetPDBRankFromState(goalState, rank);
+	pdbData[rank] = 0;
+
+	std::queue<uint64_t> openQueue;
+	openQueue.push(rank);
+	int depth = -1;
+	uint64_t numTotal = 0;
+	uint64_t numNodesOfCurDepth = 0;
+	uint64_t nextRank;
+	SlidingTilePuzzleState nextState(goalState.width,goalState.height);
+	std::vector<SlidingTilePuzzleAction> actions;
+	while (!openQueue.empty())
+	{
+		nextRank = openQueue.front();
+		openQueue.pop();
+		//in this case, we have justed finished last depth
+		if (pdbData[nextRank] == depth + 1)
+		{
+			depth++;
+			std::cout << "depth: " << depth << " " << 1 + openQueue.size() << " of " << pdbSize << "\n";
+			numTotal += 1 + openQueue.size();
+		}
+
+		GetStateFromPDBRank(nextState, nextRank);
+		env->GetActions(nextState, actions);
+		//generate its successors
+		for (unsigned int i = 0; i < actions.size(); i++)
+		{
+			env->ApplyAction(nextState, actions[i]);
+			
+			GetPDBRankFromState(nextState, nextRank);
+			if (pdbData[nextRank] > depth+1)
+			{
+				pdbData[nextRank] = depth+1;
+				openQueue.push(nextRank);
+			}		
+
+			env->UndoAction(nextState, actions[i]);
+		}
+	}
+	std::cout<<"total num of nodes: "<<numTotal<<" of " << pdbSize << "\n";
+}
 
 std::string SlidingTilePuzzlePDB::GetFileName(const char *prefix)
 {
@@ -324,9 +370,8 @@ void SlidingTilePuzzlePDB::Save(const char* prefix)
 	std::string fileName = GetFileName(prefix);
 	FILE *f = fopen(fileName.c_str(), "w+b");
 	//TODO add real reaing code here
-	//fwrite(&type, sizeof(type), 1, f);
-	//fwrite(&goalState, sizeof(goalState), 1, f);
-	//PDB.Write(f);
+
+	fwrite(pdbData.data(), sizeof(uint8_t), pdbSize, f);
 	fclose(f);
 	std::cout << "Saved PDB: " << fileName << "\n";
 }
@@ -340,16 +385,25 @@ bool SlidingTilePuzzlePDB::Load(const char* prefix)
 		std::cout << "Could not load PDB: " << fileName << "\n";
 		return false;
 	}
-	//if (fread(&type, sizeof(type), 1, f) != 1)
-	//	return false;
-	//if (fread(&goalState, sizeof(goalState), 1, f) != 1)
-	//	return false;
-	//TODO add real reaing code here
-	bool result = true;
-	fclose(f);
-	if (result)
-		std::cout << "Successfully loaded PDB: " << fileName << "\n";
-	else
+	fseek(f, 0, SEEK_END);
+	uint64_t fileSize= ftell(f);
+	rewind(f);
+	if (fileSize != pdbSize)
+	{
+		std::cout << "Error: unmatched file size: " << fileName << " \n";
+		return false;
+	}
+		
+	uint8_t* data = new uint8_t[pdbSize];
+	uint64_t bytesRead = fread(data, sizeof(uint8_t), pdbSize, f);
+	if ( bytesRead != pdbSize)
+	{
 		std::cout << "Could not load PDB: " << fileName << "\n";
-	return result;
+		return false;
+	}
+	fclose(f);
+	pdbData = std::vector<uint8_t>(data,data+pdbSize);
+	std::cout << "Successfully loaded PDB: " << fileName << "\n";
+
+	return true;
 }
