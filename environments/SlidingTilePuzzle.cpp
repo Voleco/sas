@@ -149,7 +149,7 @@ void SlidingTilePuzzle::GetStateFromRank(SlidingTilePuzzleState& state, const ui
 		if (state.puzzle[i] == 0)
 		{
 			state.blankIdx = i;
-			return;
+			break;
 		}
 	}
 }
@@ -211,10 +211,13 @@ void SlidingTilePuzzle::GetStateFromRank(SlidingTilePuzzleState& state, const ui
 }
 */
 
-SlidingTilePuzzlePDB::SlidingTilePuzzlePDB(SlidingTilePuzzle* env, SlidingTilePuzzleState &s, std::vector<int> p)
-	:pattern(p),pdbSize(0)
+SlidingTilePuzzlePDB::SlidingTilePuzzlePDB(SlidingTilePuzzle* e, SlidingTilePuzzleState &s, std::vector<int> p)
+	:env(e),pattern(p),pdbSize(0),goalState(s)
 {
 	pdbSize = FactorialN_K(s.puzzle.size(), s.puzzle.size() - pattern.size());
+	uint64_t r;
+	GetPDBRankFromState(s, r);
+	GetStateFromPDBRank(goalState, r);
 }
 
 uint64_t SlidingTilePuzzlePDB::FactorialN_K(int n, int k)
@@ -277,6 +280,76 @@ void SlidingTilePuzzlePDB::GetStateFromPDBRank(SlidingTilePuzzleState& state, co
 				count--;
 			index++;
 		}
+		while (state.puzzle[index] != -1)
+			index++;
 		state.puzzle[index] = pattern[i];
 	}
+	for (int i = 0; i < state.puzzle.size(); i++)
+		if (state.puzzle[i] == 0)
+		{
+			state.blankIdx = i;
+			break;
+		}
+
+}
+
+
+std::string SlidingTilePuzzlePDB::GetFileName(const char *prefix)
+{
+	std::string fileName;
+	fileName += prefix;
+
+	fileName += std::to_string(env->width)+"x"+ std::to_string(env->height)+"puzzle";
+	fileName += "-";
+	for (int x = 0; x < goalState.puzzle.size(); x++)
+	{
+		fileName += std::to_string(goalState.puzzle[x]);
+		fileName += ";";
+	}
+	fileName.pop_back(); // remove colon
+	fileName += "-";
+	for (int x = 0; x < pattern.size(); x++)
+	{
+		fileName += std::to_string(pattern[x]);
+		fileName += ";";
+	}
+	fileName.pop_back(); // remove colon
+	fileName += ".pdb";
+
+	return fileName;
+}
+
+void SlidingTilePuzzlePDB::Save(const char* prefix)
+{
+	std::string fileName = GetFileName(prefix);
+	FILE *f = fopen(fileName.c_str(), "w+b");
+	//TODO add real reaing code here
+	//fwrite(&type, sizeof(type), 1, f);
+	//fwrite(&goalState, sizeof(goalState), 1, f);
+	//PDB.Write(f);
+	fclose(f);
+	std::cout << "Saved PDB: " << fileName << "\n";
+}
+
+bool SlidingTilePuzzlePDB::Load(const char* prefix)
+{
+	std::string fileName = GetFileName(prefix);
+	FILE *f = fopen(fileName.c_str(), "rb");
+	if (f == 0)
+	{
+		std::cout << "Could not load PDB: " << fileName << "\n";
+		return false;
+	}
+	//if (fread(&type, sizeof(type), 1, f) != 1)
+	//	return false;
+	//if (fread(&goalState, sizeof(goalState), 1, f) != 1)
+	//	return false;
+	//TODO add real reaing code here
+	bool result = true;
+	fclose(f);
+	if (result)
+		std::cout << "Successfully loaded PDB: " << fileName << "\n";
+	else
+		std::cout << "Could not load PDB: " << fileName << "\n";
+	return result;
 }

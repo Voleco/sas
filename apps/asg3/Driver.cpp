@@ -41,13 +41,16 @@ int main(int argc,char** argv)
 		std::vector<int> pattern;
 		for (int i = 0; i < 7; i++)
 			pattern.push_back(i);
-		SlidingTilePuzzlePDB* pdb = new SlidingTilePuzzlePDB(puzzle, goal, pattern);
+		SlidingTilePuzzlePDB* pdb = new SlidingTilePuzzlePDB(puzzle, start, pattern);
 
 		std::cout << "origin state: " << start << "\n";
 		pdb->GetPDBRankFromState(start, rank);
 		std::cout << "rank: " << rank << "\n";
 		pdb->GetStateFromPDBRank(goal, rank);
 		std::cout << "retrieved state: " << goal << "\n";
+
+		pdb->Save(argv[3]);
+		pdb->Load(argv[3]);
 	}
 
 	else

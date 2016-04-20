@@ -3,6 +3,7 @@
 #define SLIDING_TILE_PUZZLE_H
 
 #include <iostream>
+#include <string>
 #include <stack>
 #include "MyEnvironment.h"
 
@@ -127,7 +128,7 @@ public:
 class SlidingTilePuzzlePDB
 {
 public:
-	SlidingTilePuzzlePDB(SlidingTilePuzzle* env, SlidingTilePuzzleState &s, std::vector<int> p);
+	SlidingTilePuzzlePDB(SlidingTilePuzzle* e, SlidingTilePuzzleState &s, std::vector<int> p);
 	uint64_t GetPDBSize() const { return pdbSize; }
 
 	void GetAbstractState(const SlidingTilePuzzleState& state, SlidingTilePuzzleState& abstate);
@@ -135,12 +136,16 @@ public:
 	void GetStateFromPDBRank(SlidingTilePuzzleState& state, const uint64_t& rank);
 
 	//void BuildPDB();
-	//void Save(const char* hprefix);
-	//void Load(const char* hprefix);
+
+	std::string GetFileName(const char *prefix);
+	void Save(const char* prefix);
+	bool Load(const char* prefix);
 
 	uint64_t FactorialN_K(int n, int k);
 
 
+	SlidingTilePuzzle* env;
+	SlidingTilePuzzleState goalState;
 	std::vector<int> pattern;
 	uint64_t pdbSize;
 };
