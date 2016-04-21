@@ -7,6 +7,7 @@
 #include <stack>
 #include <queue>
 #include "MyEnvironment.h"
+#include "MyHeuristic.h"
 
 #define Right 0
 #define Up    1
@@ -27,6 +28,7 @@ public:
 			puzzle[i] = s.puzzle[i];
 		blankIdx = s.blankIdx;
 	}
+	~SlidingTilePuzzleState() {}
 	void Reset() 
 	{ 
 		puzzle.resize(0);
@@ -84,7 +86,7 @@ static std::ostream& operator <<(std::ostream & out, const SlidingTilePuzzleActi
 	return out;
 }
 
-class ManhattanDistanceHeuristic
+class ManhattanDistanceHeuristic:public MyHeuristic<SlidingTilePuzzleState>
 {
 public:
 	ManhattanDistanceHeuristic() { }
@@ -99,7 +101,10 @@ class SlidingTilePuzzle : public MyEnvironment<SlidingTilePuzzleState, SlidingTi
 {
 public:
 	SlidingTilePuzzle() { historyActions.push(-1); }
-	SlidingTilePuzzle(unsigned int w, unsigned int h):width(w),height(h) { historyActions.push(-1); }
+	SlidingTilePuzzle(unsigned int w, unsigned int h, bool _allow_move_back=false):width(w),height(h),allowMoveBack(_allow_move_back) { historyActions.push(-1); }
+	SlidingTilePuzzle(const SlidingTilePuzzle& s)
+		:width(s.width),height(s.height),allowMoveBack(s.allowMoveBack),historyActions(s.historyActions)
+	{}
 	~SlidingTilePuzzle() {}
 
 	void GetActions(SlidingTilePuzzleState &nodeID, std::vector<SlidingTilePuzzleAction> &actions);
@@ -117,19 +122,26 @@ public:
 		return table[val];
 	}
 
-
 	void GetRankFromState(const SlidingTilePuzzleState& state, uint64_t& rank);
 	void GetStateFromRank(SlidingTilePuzzleState& state, const uint64_t& rank);
 	std::stack<SlidingTilePuzzleAction> historyActions;
 	unsigned int width;
 	unsigned int height;
-
+	bool allowMoveBack;
 };
 
-class SlidingTilePuzzlePDB
+class SlidingTilePuzzlePDB :public MyHeuristic<SlidingTilePuzzleState>
 {
 public:
-	SlidingTilePuzzlePDB(SlidingTilePuzzle* e, SlidingTilePuzzleState &s, std::vector<int> p);
+	SlidingTilePuzzlePDB(SlidingTilePuzzle e, SlidingTilePuzzleState s, std::vector<int> p);
+	SlidingTilePuzzlePDB() {}
+	SlidingTilePuzzlePDB(const SlidingTilePuzzlePDB& s) 
+		:env(s.env),goalState(s.goalState),pattern(s.pattern),pdbSize(s.pdbSize),pdbData(s.pdbData)
+	{}
+	~SlidingTilePuzzlePDB() {}
+
+	int GetHCost(SlidingTilePuzzleState& s);
+
 	uint64_t GetPDBSize() const { return pdbSize; }
 
 	//void GetAbstractState(const SlidingTilePuzzleState& state, SlidingTilePuzzleState& abstate);
@@ -145,7 +157,7 @@ public:
 	uint64_t FactorialN_K(int n, int k);
 
 
-	SlidingTilePuzzle* env;
+	SlidingTilePuzzle env;
 	SlidingTilePuzzleState goalState;
 	std::vector<int> pattern;
 	uint64_t pdbSize;

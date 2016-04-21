@@ -1,7 +1,7 @@
 
 #include "SlidingTilePuzzle.h"
 
-int  ManhattanDistanceHeuristic::GetHCost(SlidingTilePuzzleState& s)
+int ManhattanDistanceHeuristic::GetHCost(SlidingTilePuzzleState& s)
 {
 	int hcost = 0;
 	int xdiff = 0;
@@ -76,7 +76,8 @@ void SlidingTilePuzzle::ApplyAction(SlidingTilePuzzleState& s, SlidingTilePuzzle
 	s.puzzle[s.blankIdx] = s.puzzle[inx];
 	s.puzzle[inx] = 0;
 	s.blankIdx = inx;
-	historyActions.push(a);
+	if (allowMoveBack == false)
+		historyActions.push(a);
 	//std::cout << "state applied actions:\n" << s;
 }
 
@@ -105,57 +106,57 @@ void SlidingTilePuzzle::UndoAction(SlidingTilePuzzleState& s, SlidingTilePuzzleA
 	s.puzzle[s.blankIdx] = s.puzzle[inx];
 	s.puzzle[inx] = 0;
 	s.blankIdx = inx;
-	historyActions.pop();
+	if (allowMoveBack == false)
+		historyActions.pop();
 	//std::cout << "state undid actions:\n" << s;
 }
 
 //Lexicographical ranking
-void SlidingTilePuzzle::GetRankFromState(const SlidingTilePuzzleState& state, uint64_t& rank)
-{
-	int size = state.width*state.height;
-	rank = 0;
-	int s = 0;
-	for (int i = 0; i < size; i++)
-	{
-		s = 0;
-		for (int j = i + 1; j < size; j++)
-			if (state.puzzle[j] < state.puzzle[i])
-				s++;
+//void SlidingTilePuzzle::GetRankFromState(const SlidingTilePuzzleState& state, uint64_t& rank)
+//{
+//	int size = state.width*state.height;
+//	rank = 0;
+//	int s = 0;
+//	for (int i = 0; i < size; i++)
+//	{
+//		s = 0;
+//		for (int j = i + 1; j < size; j++)
+//			if (state.puzzle[j] < state.puzzle[i])
+//				s++;
+//
+//		rank += s*Factorial(size - 1 - i);
+//	}
+//
+//}
+//void SlidingTilePuzzle::GetStateFromRank(SlidingTilePuzzleState& state, const uint64_t& rank)
+//{
+//	state = SlidingTilePuzzleState(width, height);
+//	state.Reset();
+//	int size = width*height;
+//	std::vector<int> pz;
+//	for (int i = 0; i < size; i++)
+//		pz.push_back(i);
+//	uint64_t countRight = 0;
+//	uint64_t r = rank;
+//	for (int i = 0; i < size; i++)
+//	{
+//		countRight = r / Factorial(size - 1 - i);
+//		r = r%Factorial(size - 1 - i);
+//		state.puzzle[i] = pz[countRight];
+//		pz.erase(pz.begin() + countRight);
+//	}
+//
+//	for (int i = 0; i < size; i++)
+//	{
+//		if (state.puzzle[i] == 0)
+//		{
+//			state.blankIdx = i;
+//			break;
+//		}
+//	}
+//}
 
-		rank += s*Factorial(size - 1 - i);
-	}
-
-}
-void SlidingTilePuzzle::GetStateFromRank(SlidingTilePuzzleState& state, const uint64_t& rank)
-{
-	state = SlidingTilePuzzleState(width, height);
-	state.Reset();
-	int size = width*height;
-	std::vector<int> pz;
-	for (int i = 0; i < size; i++)
-		pz.push_back(i);
-	uint64_t countRight = 0;
-	uint64_t r = rank;
-	for (int i = 0; i < size; i++)
-	{
-		countRight = r / Factorial(size - 1 - i);
-		r = r%Factorial(size - 1 - i);
-		state.puzzle[i] = pz[countRight];
-		pz.erase(pz.begin() + countRight);
-	}
-
-	for (int i = 0; i < size; i++)
-	{
-		if (state.puzzle[i] == 0)
-		{
-			state.blankIdx = i;
-			break;
-		}
-	}
-}
-
-// Myrvold/Ruskey linear-time method
-/*
+// Myrvold/Ruskey linear-time method ranking
 void SlidingTilePuzzle::GetRankFromState(const SlidingTilePuzzleState& state, uint64_t& rank)
 {
 	//make a copy of the state
@@ -209,9 +210,9 @@ void SlidingTilePuzzle::GetStateFromRank(SlidingTilePuzzleState& state, const ui
 			break;
 		}
 }
-*/
 
-SlidingTilePuzzlePDB::SlidingTilePuzzlePDB(SlidingTilePuzzle* e, SlidingTilePuzzleState &s, std::vector<int> p)
+
+SlidingTilePuzzlePDB::SlidingTilePuzzlePDB(SlidingTilePuzzle e, SlidingTilePuzzleState s, std::vector<int> p)
 	:env(e),pattern(p),pdbSize(0),goalState(s)
 {
 	uint64_t r;
@@ -321,11 +322,11 @@ void SlidingTilePuzzlePDB::BuildPDB()
 		}
 
 		GetStateFromPDBRank(nextState, nextRank);
-		env->GetActions(nextState, actions);
+		env.GetActions(nextState, actions);
 		//generate its successors
 		for (unsigned int i = 0; i < actions.size(); i++)
 		{
-			env->ApplyAction(nextState, actions[i]);
+			env.ApplyAction(nextState, actions[i]);
 			
 			GetPDBRankFromState(nextState, nextRank);
 			if (pdbData[nextRank] > depth+1)
@@ -334,7 +335,7 @@ void SlidingTilePuzzlePDB::BuildPDB()
 				openQueue.push(nextRank);
 			}		
 
-			env->UndoAction(nextState, actions[i]);
+			env.UndoAction(nextState, actions[i]);
 		}
 	}
 	std::cout<<"total num of nodes: "<<numTotal<<" of " << pdbSize << "\n";
@@ -345,7 +346,9 @@ std::string SlidingTilePuzzlePDB::GetFileName(const char *prefix)
 	std::string fileName;
 	fileName += prefix;
 
-	fileName += std::to_string(env->width)+"x"+ std::to_string(env->height)+"puzzle";
+	if (fileName.back() != '/')
+		fileName += "/";
+	fileName += std::to_string(env.width)+"x"+ std::to_string(env.height)+"puzzle";
 	fileName += "-";
 	for (int x = 0; x < goalState.puzzle.size(); x++)
 	{
@@ -406,4 +409,11 @@ bool SlidingTilePuzzlePDB::Load(const char* prefix)
 	std::cout << "Successfully loaded PDB: " << fileName << "\n";
 
 	return true;
+}
+
+int SlidingTilePuzzlePDB::GetHCost(SlidingTilePuzzleState& s)
+{
+	uint64_t index;
+	GetPDBRankFromState(s, index);
+	return pdbData[index];
 }

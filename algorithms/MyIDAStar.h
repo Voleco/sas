@@ -85,10 +85,17 @@ template <typename state, typename action, typename environment, typename heuris
 std::vector<action> MyIDAStar<state, action, environment, heuristic>::GetActionSequence()
 {
 	std::vector<action> result;
+	std::stack<action> tmp;
+	//use 2 stacks as 1 queue
 	while (!actionSequence.empty())
 	{
-		result.push_back(actionSequence.top());
+		tmp.push(actionSequence.top());
 		actionSequence.pop();
+	}
+	while (!tmp.empty())
+	{
+		result.push_back(tmp.top());
+		tmp.pop();
 	}
 	return result;
 }
