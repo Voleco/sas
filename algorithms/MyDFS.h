@@ -10,11 +10,11 @@ template <typename state, typename action, typename environment>
 class MyDFS :public MySearchAlgorithm<state, action, environment>
 {
 public:
-	MyDFS(environment &e, state& start, state& goal,unsigned int md,bool dd=false)
-		:MySearchAlgorithm<state, action, environment>(e, start, goal),nodesExpanded(0),maxDepthAllowed(md),duplicateDetection(dd)
+	MyDFS(unsigned int md,bool dd=false)
+		:MySearchAlgorithm<state, action, environment>(),nodesExpanded(0),maxDepthAllowed(md),duplicateDetection(dd)
 	{
 	}
-	virtual bool GetPath(environment &e, state &start, state &goal);
+	virtual bool GetPath(environment e, state start, state goal);
 	virtual uint64_t GetNodesExpanded() { return nodesExpanded; }
 protected:
 	uint64_t nodesExpanded;
@@ -27,8 +27,8 @@ template <typename state, typename action, typename environment>
 class MyDFID
 {
 public:
-	MyDFID(environment &e, state& start, state& goal, bool dd = false) :totalNodesExpanded(0), duplicateDetection(dd){ maxDepth = 1+e.GetSolutionDepthUpperBound(start, goal); }
-	bool GetPath(environment &e, state &start, state &goal);
+	MyDFID(bool dd = false,int _maxDepth=0) :totalNodesExpanded(0),maxDepth(_maxDepth),duplicateDetection(dd){}
+	bool GetPath(environment e, state start, state goal);
 	uint64_t GetNodesExpanded() { return totalNodesExpanded; }
 private:
 	uint64_t totalNodesExpanded;
@@ -37,7 +37,7 @@ private:
 };
 
 template <typename state, typename action, typename environment>
-bool MyDFS<state, action, environment>::GetPath(environment &e, state &start, state &goal)
+bool MyDFS<state, action, environment>::GetPath(environment e, state start, state goal)
 {
 	bool found = false;
 
@@ -99,13 +99,15 @@ bool MyDFS<state, action, environment>::GetPath(environment &e, state &start, st
 
 
 template <typename state, typename action, typename environment>
-bool MyDFID<state, action, environment>::GetPath(environment &e, state &start, state &goal)
+bool MyDFID<state, action, environment>::GetPath(environment e, state start, state goal)
 {
+	if(maxDepth==0)
+		maxDepth = 1 + e.GetSolutionDepthUpperBound(start, goal);
 	MyDFS<state, action, environment>* dfs;
 	bool pathFound = false;
 	for (unsigned int i = 0; i < maxDepth; i++)
 	{
-		dfs = new MyDFS<state, action, environment>(e, start, goal, i,duplicateDetection);
+		dfs = new MyDFS<state, action, environment>(i,duplicateDetection);
 		pathFound = dfs->GetPath(e,start,goal);
 		//std::cout << "nodes expanded at iteration "<<i<<": " << dfs->GetNodesExpanded()<< "\n";
 		totalNodesExpanded += dfs->GetNodesExpanded();

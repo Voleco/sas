@@ -15,28 +15,28 @@ int main(int argc, char** argv)
 		GridBasedMapState goal(atoi(argv[4]), atoi(argv[5]));
 
 		std::cout << "start state: " << start << "\n" << "goal state: " << goal << "\n";
-		MyBFS<GridBasedMapState, GridBasedMapAction, GridBasedMap> bfs(map, start, goal,false);
+		MyBFS<GridBasedMapState, GridBasedMapAction, GridBasedMap> bfs(false);
 		if (bfs.GetPath(map, start, goal))
 			std::cout << "\nBFS(without duplicate detection) found a path!\n";
 		else
 			std::cout << "\nBFS(without duplicate detection) did not find a path.\n";
 		std::cout << "nodes expanded: " << bfs.GetNodesExpanded() << "\n";
 
-		MyBFS<GridBasedMapState, GridBasedMapAction, GridBasedMap> bfs2(map, start, goal,true);
+		MyBFS<GridBasedMapState, GridBasedMapAction, GridBasedMap> bfs2(true);
 		if (bfs2.GetPath(map, start, goal))
 			std::cout << "\nBFS(with duplicate detection) found a path!\n";
 		else
 			std::cout << "\nBFS(with duplicate detection) did not find a path.\n";
 		std::cout << "nodes expanded: " << bfs2.GetNodesExpanded() << "\n";
 
-		MyDFID<GridBasedMapState, GridBasedMapAction, GridBasedMap> dfid(map, start, goal,false);
+		MyDFID<GridBasedMapState, GridBasedMapAction, GridBasedMap> dfid(false);
 		if (dfid.GetPath(map, start, goal))
 			std::cout << "\nDFID(without duplicate detection) found a path!\n";
 		else
 			std::cout << "\nDFID(without duplicate detection) did not find a path.\n";
 		std::cout << "nodes expanded: " << dfid.GetNodesExpanded() << "\n";
 
-		MyDFID<GridBasedMapState, GridBasedMapAction, GridBasedMap> dfid2(map, start, goal,true);
+		MyDFID<GridBasedMapState, GridBasedMapAction, GridBasedMap> dfid2(true);
 		if (dfid2.GetPath(map, start, goal))
 			std::cout << "\nDFID(with duplicate detection) found a path!\n";
 		else
@@ -50,28 +50,28 @@ int main(int argc, char** argv)
 		NAryTreeState goal = atoi(argv[4]);
 
 		std::cout << "start state: " << start << "\n" << "goal state: " << goal << "\n";
-		MyBFS<NAryTreeState, NAryTreeAction, NAryTree> bfs(tree, start, goal, false);
+		MyBFS<NAryTreeState, NAryTreeAction, NAryTree> bfs(false);
 		if (bfs.GetPath(tree, start, goal))
 			std::cout << "\nBFS(without duplicate detection) found a path!\n";
 		else
 			std::cout << "\nBFS(without duplicate detection) did not find a path.\n";
 		std::cout << "nodes expanded: " << bfs.GetNodesExpanded() << "\n";
 
-		MyBFS<NAryTreeState, NAryTreeAction, NAryTree> bfs2(tree, start, goal, true);
+		MyBFS<NAryTreeState, NAryTreeAction, NAryTree> bfs2(true);
 		if (bfs2.GetPath(tree, start, goal))
 			std::cout << "\nBFS(with duplicate detection) found a path!\n";
 		else
 			std::cout << "\nBFS(with duplicate detection) did not find a path.\n";
 		std::cout << "nodes expanded: " << bfs2.GetNodesExpanded() << "\n";
 
-		MyDFID<NAryTreeState, NAryTreeAction, NAryTree> dfid(tree, start, goal,false);
+		MyDFID<NAryTreeState, NAryTreeAction, NAryTree> dfid(false);
 		if (dfid.GetPath(tree, start, goal))
 			std::cout << "\nDFID(without duplicate detection) found a path!\n";
 		else
 			std::cout << "\nDFID(without duplicate detection) did not find a path.\n";
 		std::cout << "nodes expanded: " << dfid.GetNodesExpanded() << "\n";
 
-		MyDFID<NAryTreeState, NAryTreeAction, NAryTree> dfid2(tree, start, goal,true);
+		MyDFID<NAryTreeState, NAryTreeAction, NAryTree> dfid2(true);
 		if (dfid2.GetPath(tree, start, goal))
 			std::cout << "\nDFID(with duplicate detection) found a path!\n";
 		else

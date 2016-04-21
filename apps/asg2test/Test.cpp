@@ -21,14 +21,14 @@ int main()
 		GridBasedMapHeuristic heur;
 		heur.SetGoal(goal);
 
-		MyBFS<GridBasedMapState, GridBasedMapAction, GridBasedMap> bfs(map, start, goal, true);
+		MyBFS<GridBasedMapState, GridBasedMapAction, GridBasedMap> bfs( true);
 		bfs.GetPath(map, start, goal);
 
-		MyDFID<GridBasedMapState, GridBasedMapAction, GridBasedMap> dfid(map, start, goal, true);
+		MyDFID<GridBasedMapState, GridBasedMapAction, GridBasedMap> dfid( true);
 		dfid.GetPath(map, start, goal);
 
 		MyIDAStar<GridBasedMapState, GridBasedMapAction, GridBasedMap, GridBasedMapHeuristic>
-			ida(map, start, goal, heur, 1 + map.GetSolutionDepthUpperBound(start, goal));
+			ida( heur, 1 + map.GetSolutionDepthUpperBound(start, goal));
 		ida.GetPath(map, start, goal);
 
 		std::cout << i << "\t" << ida.GetNodesExpanded()<<"\t"
@@ -52,11 +52,11 @@ int main()
 		NAryTreeHeuristic heur;
 		heur.SetGoal(goal);
 
-		MyBFS<NAryTreeState, NAryTreeAction, NAryTree> bfs(tree, start, goal, false);
+		MyBFS<NAryTreeState, NAryTreeAction, NAryTree> bfs( false);
 		bfs.GetPath(tree, start, goal);
 
 		MyIDAStar<NAryTreeState, NAryTreeAction, NAryTree, NAryTreeHeuristic>
-			ida(tree, start, goal, heur, 1 + tree.GetSolutionDepthUpperBound(start,goal));
+			ida( heur, 1 + tree.GetSolutionDepthUpperBound(start,goal));
 		ida.GetPath(tree, start, goal);
 
 		std::cout << i << "\t" << ida.GetNodesExpanded() << "\t"

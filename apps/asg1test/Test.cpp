@@ -16,17 +16,17 @@ int main(int argc, char** argv)
 		GridBasedMapState start(0, 0);
 		GridBasedMapState goal(i, i);
 
-		MyBFS<GridBasedMapState, GridBasedMapAction, GridBasedMap> bfs(map, start, goal, false);
+		MyBFS<GridBasedMapState, GridBasedMapAction, GridBasedMap> bfs(false);
 		bfs.GetPath(map, start, goal);
 
 
-		MyBFS<GridBasedMapState, GridBasedMapAction, GridBasedMap> bfs2(map, start, goal, true);
+		MyBFS<GridBasedMapState, GridBasedMapAction, GridBasedMap> bfs2( true);
 		bfs2.GetPath(map, start, goal);
 
-		MyDFID<GridBasedMapState, GridBasedMapAction, GridBasedMap> dfid(map, start, goal, false);
+		MyDFID<GridBasedMapState, GridBasedMapAction, GridBasedMap> dfid( false);
 		dfid.GetPath(map, start, goal);
 
-		MyDFID<GridBasedMapState, GridBasedMapAction, GridBasedMap> dfid2(map, start, goal, true);
+		MyDFID<GridBasedMapState, GridBasedMapAction, GridBasedMap> dfid2( true);
 		dfid2.GetPath(map, start, goal);
 
 		std::cout << i << "\t" << bfs.GetNodesExpanded() << "\t"
@@ -48,16 +48,16 @@ int main(int argc, char** argv)
 		tmp = (tmp - 1) / (i - 1);
 		NAryTreeState goal(tmp);
 
-		MyBFS<NAryTreeState, NAryTreeAction, NAryTree> bfs(tree, start, goal, false);
+		MyBFS<NAryTreeState, NAryTreeAction, NAryTree> bfs(false);
 		bfs.GetPath(tree, start, goal);
 
-		MyBFS<NAryTreeState, NAryTreeAction, NAryTree> bfs2(tree, start, goal, true);
+		MyBFS<NAryTreeState, NAryTreeAction, NAryTree> bfs2(true);
 		bfs2.GetPath(tree, start, goal);
 
-		MyDFID<NAryTreeState, NAryTreeAction, NAryTree> dfid(tree, start, goal, false);
+		MyDFID<NAryTreeState, NAryTreeAction, NAryTree> dfid( false);
 		dfid.GetPath(tree, start, goal);
 
-		MyDFID<NAryTreeState, NAryTreeAction, NAryTree> dfid2(tree, start, goal, true);
+		MyDFID<NAryTreeState, NAryTreeAction, NAryTree> dfid2( true);
 		dfid2.GetPath(tree, start, goal);
 		
 		std::cout << i << "\t" << bfs.GetNodesExpanded() << "\t"

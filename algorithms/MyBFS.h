@@ -11,11 +11,11 @@ template <typename state, typename action, typename environment>
 class MyBFS :public MySearchAlgorithm<state, action, environment>
 {
 public:
-	MyBFS(environment &e, state& start, state& goal, bool dd=false)
-		:MySearchAlgorithm<state, action, environment>(e,start,goal),nodesExpanded(0),duplicateDetection(dd)
+	MyBFS(bool dd=false)
+		:MySearchAlgorithm<state, action, environment>(),nodesExpanded(0),duplicateDetection(dd)
 	{
 	}
-	virtual bool GetPath(environment &e, state &start, state &goal);
+	virtual bool GetPath(environment e, state start, state goal);
 	virtual uint64_t GetNodesExpanded() { return nodesExpanded; }
 protected:
 	uint64_t nodesExpanded;
@@ -23,7 +23,7 @@ protected:
 };
 
 template <typename state, typename action, typename environment>
-bool MyBFS<state, action, environment>::GetPath(environment &e, state &start, state &goal)
+bool MyBFS<state, action, environment>::GetPath(environment e, state start, state goal)
 {
 	//std::cout << "start: " << start << "\n"<< "goal: " << goal << "\n";
 	bool found = false;

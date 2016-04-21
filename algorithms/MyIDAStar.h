@@ -11,12 +11,12 @@ template <typename state, typename action, typename environment, typename heuris
 class MyIDAStar :public MySearchAlgorithm<state, action, environment>
 {
 public:
-	MyIDAStar(environment &e, state& start, state& goal, heuristic& h, int md)
-		:MySearchAlgorithm<state, action, environment>(e, start, goal), nodesExpanded(0), maxFAllowed(md), heur(h),nextF(-1)
+	MyIDAStar(heuristic& h, int md)
+		:MySearchAlgorithm<state, action, environment>(), nodesExpanded(0), maxFAllowed(md), heur(h),nextF(-1)
 	{
 	}
-	virtual bool GetPath(environment &e, state &start, state &goal);
-	bool GetPathWithinF(environment &e, state &start, state &goal, int f,int gcost);
+	virtual bool GetPath(environment e, state start, state goal);
+	bool GetPathWithinF(environment e, state start, state goal, int f,int gcost);
 	virtual uint64_t GetNodesExpanded() { return nodesExpanded; }
 	std::vector<action> GetActionSequence();
 protected:
@@ -29,7 +29,7 @@ protected:
 
 
 template <typename state, typename action, typename environment, typename heuristic>
-bool MyIDAStar<state, action, environment, heuristic>::GetPath(environment &e, state &start, state &goal)
+bool MyIDAStar<state, action, environment, heuristic>::GetPath(environment e, state start, state goal)
 {
 	nextF = -1;
 	while(!actionSequence.empty())
@@ -45,7 +45,7 @@ bool MyIDAStar<state, action, environment, heuristic>::GetPath(environment &e, s
 }
 
 template <typename state, typename action, typename environment, typename heuristic>
-bool MyIDAStar<state, action, environment, heuristic>::GetPathWithinF(environment &e, state &start, state &goal, int f,int gcost)
+bool MyIDAStar<state, action, environment, heuristic>::GetPathWithinF(environment e, state start, state goal, int f,int gcost)
 {
 	int hcost = heur.GetHCost(start);
 	int fcost = hcost + gcost;

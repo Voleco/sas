@@ -25,7 +25,7 @@ int main(int argc,char** argv)
 		if (argc > 4 && strcmp(argv[4], "-showpath") == 0)
 			showPath = true;
 
-		SlidingTilePuzzle* puzzle;
+		SlidingTilePuzzle puzzle(4,4);
 		SlidingTilePuzzleState start(4, 4);
 		SlidingTilePuzzleState goal(4, 4);
 		ManhattanDistanceHeuristic heur;
@@ -44,14 +44,13 @@ int main(int argc,char** argv)
 		{
 			startTime = clock();
 			GetSildingTileInstance(i, start);
-			puzzle = new SlidingTilePuzzle(4, 4);
-			ida = new MyIDAStar<SlidingTilePuzzleState, SlidingTilePuzzleAction, SlidingTilePuzzle, ManhattanDistanceHeuristic>(*puzzle, start, goal, heur, 500);
+			ida = new MyIDAStar<SlidingTilePuzzleState, SlidingTilePuzzleAction, SlidingTilePuzzle, ManhattanDistanceHeuristic>(heur, 500);
 			std::cout << "********************************\n"
 				<< "Puzzle " << i + 1 << " of 100\n"
 				<< "start: " << start
 				<< "goal: " << goal << "\n";
 			std::vector<SlidingTilePuzzleAction> acs;
-			if (ida->GetPath(*puzzle, start, goal))
+			if (ida->GetPath(puzzle, start, goal))
 			{
 				std::cout << "IDA* found a path!\n";
 				acs = ida->GetActionSequence();
@@ -70,7 +69,6 @@ int main(int argc,char** argv)
 			std::cout << "nodes expanded: " << ida->GetNodesExpanded() << "\n";
 
 			delete ida;
-			delete puzzle;
 
 			endTime = clock();
 			clockTicksTaken = endTime - startTime;
@@ -94,7 +92,7 @@ int main(int argc,char** argv)
 		MyIDAStar<NAryTreeState, NAryTreeAction, NAryTree, NAryTreeHeuristic>
 			*ida;
 
-		ida = new MyIDAStar<NAryTreeState, NAryTreeAction, NAryTree, NAryTreeHeuristic>(tree, start, goal, heur, 1+tree.GetSolutionDepthUpperBound(start, goal));
+		ida = new MyIDAStar<NAryTreeState, NAryTreeAction, NAryTree, NAryTreeHeuristic>(heur, 1+tree.GetSolutionDepthUpperBound(start, goal));
 		std::cout << "********************************\n"
 			<< "start: " << start
 			<< "goal: " << goal << "\n";
@@ -136,7 +134,7 @@ int main(int argc,char** argv)
 			*ida;
 
 		//std::cout << "\nestimated upperbound: " << map.GetSolutionDepthUpperBound(start, goal) << "\n";
-		ida = new MyIDAStar<GridBasedMapState, GridBasedMapAction, GridBasedMap, GridBasedMapHeuristic>(map, start, goal, heur, 1+map.GetSolutionDepthUpperBound(start, goal));
+		ida = new MyIDAStar<GridBasedMapState, GridBasedMapAction, GridBasedMap, GridBasedMapHeuristic>( heur, 1+map.GetSolutionDepthUpperBound(start, goal));
 		std::cout << "********************************\n"
 			<< "start: " << start
 			<< "goal: " << goal << "\n";

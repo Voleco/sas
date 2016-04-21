@@ -92,7 +92,7 @@ int main(int argc,char** argv)
 		if (argc > 5 && strcmp(argv[5], "-showpath") == 0)
 			showPath = true;
 
-		SlidingTilePuzzle* puzzle = new SlidingTilePuzzle(4,4);
+		SlidingTilePuzzle puzzle(4,4);
 		SlidingTilePuzzleState start(4, 4);
 		SlidingTilePuzzleState goal(4, 4);
 		goal.Reset();
@@ -117,7 +117,7 @@ int main(int argc,char** argv)
 		//build PDB a to e
 		for (int i = 0; i < 5; i++)
 		{
-			SlidingTilePuzzlePDB* pdb = new SlidingTilePuzzlePDB(*puzzle, goal, patterns[i]);
+			SlidingTilePuzzlePDB* pdb = new SlidingTilePuzzlePDB(puzzle, goal, patterns[i]);
 			if (!pdb->Load(argv[2]))
 			{
 				pdb->BuildPDB();
@@ -148,21 +148,12 @@ int main(int argc,char** argv)
 		{
 			
 			GetSildingTileInstance(i, start);
-			SlidingTilePuzzle pz1(*puzzle);
-			SlidingTilePuzzleState st1(start);
-			SlidingTilePuzzleState gl1(goal);
 			ida1 = new MyIDAStar<SlidingTilePuzzleState, SlidingTilePuzzleAction, SlidingTilePuzzle, ManhattanDistanceHeuristic>
-				(pz1, st1, gl1, *mh, 500);
-			SlidingTilePuzzle pz2(*puzzle);
-			SlidingTilePuzzleState st2(start);
-			SlidingTilePuzzleState gl2(goal);
+				(*mh, 500);
 			ida2 = new MyIDAStar<SlidingTilePuzzleState, SlidingTilePuzzleAction, SlidingTilePuzzle, MaxHeuristic<SlidingTilePuzzleState>>
-				(pz2, st2, gl2, maxH2, 500);
-			SlidingTilePuzzle pz3(*puzzle);
-			SlidingTilePuzzleState st3(start);
-			SlidingTilePuzzleState gl3(goal);
+				(maxH2, 500);
 			ida3 = new MyIDAStar<SlidingTilePuzzleState, SlidingTilePuzzleAction, SlidingTilePuzzle, MaxHeuristic<SlidingTilePuzzleState>>
-				(pz3, st3, gl3, maxH3, 500);
+				(maxH3, 500);
 
 			std::cout << "********************************\n"
 				<< "Puzzle " << i + 1 << " of 100\n"
@@ -172,7 +163,7 @@ int main(int argc,char** argv)
 
 			startTime = clock();
 			acs.resize(0);
-			if (ida1->GetPath(pz1, st1, gl1))
+			if (ida1->GetPath(puzzle, start, goal))
 			{
 				std::cout << "IDA* w/ only MD found a path!\n";
 				std::cout << "nodes expanded: " << ida1->GetNodesExpanded() << "\n";
@@ -195,7 +186,7 @@ int main(int argc,char** argv)
 
 			startTime = clock();
 			acs.resize(0);
-			if (ida2->GetPath(pz2, st2, gl2))
+			if (ida2->GetPath(puzzle, start, goal))
 			{
 				std::cout << "IDA* w/ max{MD,PDB a-d} found a path!\n";
 				std::cout << "nodes expanded: " << ida2->GetNodesExpanded() << "\n";
@@ -218,7 +209,7 @@ int main(int argc,char** argv)
 
 			startTime = clock();
 			acs.resize(0);
-			if (ida3->GetPath(pz3, st3, gl3))
+			if (ida3->GetPath(puzzle, start, goal))
 			{
 				std::cout << "IDA* w/ max{MD,PDB c-e} found a path!\n";
 				std::cout << "nodes expanded: " << ida3->GetNodesExpanded() << "\n";
