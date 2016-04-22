@@ -196,23 +196,23 @@ int main(int argc,char** argv)
 			if (ida1->GetPath(puzzle, startcp, goalcp))
 			{
 				std::cout << "IDA* w/ only MD found a path!\n";
-				std::cout << "nodes expanded: " << ida1->GetNodesExpanded() << "\n";
+				std::cout << "nodes expanded:\tPath length:\ttime spent(s)\n";
+				std::cout<< ida1->GetNodesExpanded() << "\t";
 				acs = ida1->GetActionSequence();
-				std::cout << "Path length: " << acs.size() << "\n";
-				if (showPath)
-				{
-					std::cout << "Path: ";
-					for (int i = 0; i < acs.size(); i++)
-						std::cout << acs[i] << " ";
-					std::cout << "\n";
-				}
+				std::cout << acs.size() << "\t";
 			}	
 			delete ida1;
-			std::cout << "IDA* w/ only MD did not find a path!!!!!!\n";
 			endTime = clock();
 			clockTicksTaken = endTime - startTime;
 			timeInSeconds = clockTicksTaken / (double)CLOCKS_PER_SEC;
-			std::cout << "time spent: " << timeInSeconds << " seconds\n";
+			std::cout << timeInSeconds << "\n";
+			if (showPath)
+			{
+				std::cout << "Path: ";
+				for (int i = 0; i < acs.size(); i++)
+					std::cout << acs[i] << " ";
+				std::cout << "\n";
+			}
 
 			startTime = clock();
 			acs.resize(0);
@@ -221,25 +221,24 @@ int main(int argc,char** argv)
 			goalcp = SlidingTilePuzzleState(goal);
 			if (ida2->GetPath(puzzle, startcp, goalcp))
 			{
-				std::cout << "IDA* w/ max{MD,PDB a-d} found a path!\n";
-				std::cout << "nodes expanded: " << ida2->GetNodesExpanded() << "\n";
+				std::cout << "IDA* w/ max{MD, PDBa-d} found a path!\n";
+				std::cout << "nodes expanded:\tPath length:\ttime spent(s)\n";
+				std::cout << ida2->GetNodesExpanded() << "\t";
 				acs = ida2->GetActionSequence();
-				std::cout << "Path length: " << acs.size() << "\n";
-				if (showPath)
-				{
-					std::cout << "Path: ";
-					for (int i = 0; i < acs.size(); i++)
-						std::cout << acs[i] << " ";
-					std::cout << "\n";
-				}
+				std::cout << acs.size() << "\t";
 			}
 			delete ida2;
-			std::cout << "IDA* w/ max{MD,PDB a-d} did not find a path!!!!!!\n";
-
 			endTime = clock();
 			clockTicksTaken = endTime - startTime;
 			timeInSeconds = clockTicksTaken / (double)CLOCKS_PER_SEC;
-			std::cout << "time spent: " << timeInSeconds << " seconds\n";
+			std::cout << timeInSeconds << "\n";
+			if (showPath)
+			{
+				std::cout << "Path: ";
+				for (int i = 0; i < acs.size(); i++)
+					std::cout << acs[i] << " ";
+				std::cout << "\n";
+			}
 
 			startTime = clock();
 			acs.resize(0);
@@ -248,24 +247,24 @@ int main(int argc,char** argv)
 			goalcp = SlidingTilePuzzleState(goal);
 			if (ida3->GetPath(puzzle, startcp, goalcp))
 			{
-				std::cout << "IDA* w/ max{MD,PDB c-e} found a path!\n";
-				std::cout << "nodes expanded: " << ida3->GetNodesExpanded() << "\n";
+				std::cout << "IDA* w/  max{MD, PDBc-e} found a path!\n";
+				std::cout << "nodes expanded:\tPath length:\ttime spent(s)\n";
+				std::cout << ida3->GetNodesExpanded() << "\t";
 				acs = ida3->GetActionSequence();
-				std::cout << "Path length: " << acs.size() << "\n";
-				if (showPath)
-				{
-					std::cout << "Path: ";
-					for (int i = 0; i < acs.size(); i++)
-						std::cout << acs[i] << " ";
-					std::cout << "\n";
-				}
+				std::cout << acs.size() << "\t";
 			}
 			delete ida3;
-
 			endTime = clock();
 			clockTicksTaken = endTime - startTime;
 			timeInSeconds = clockTicksTaken / (double)CLOCKS_PER_SEC;
-			std::cout << "time spent: " << timeInSeconds << " seconds\n";
+			std::cout << timeInSeconds << "\n";
+			if (showPath)
+			{
+				std::cout << "Path: ";
+				for (int i = 0; i < acs.size(); i++)
+					std::cout << acs[i] << " ";
+				std::cout << "\n";
+			}
 		}
 	}
 
