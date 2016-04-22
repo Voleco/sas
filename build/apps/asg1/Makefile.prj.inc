@@ -28,7 +28,6 @@ PROJ_REL_LNFLAGS = -L$(REL_BINDIR)
 PROJ_DBG_LIB =  -lutils -lenvironments 
 PROJ_REL_LIB =  -lutils -lenvironments
 
-
 PROJ_DBG_DEP = \
   $(DBG_BINDIR)/libutils.a \
   $(DBG_BINDIR)/libenvironments.a \

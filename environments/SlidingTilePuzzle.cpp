@@ -228,7 +228,7 @@ void SlidingTilePuzzle::GetStateFromRank(SlidingTilePuzzleState& state, const ui
 #endif
 
 SlidingTilePuzzlePDB::SlidingTilePuzzlePDB(SlidingTilePuzzle e, SlidingTilePuzzleState s, std::vector<int> p)
-	:env(e),pattern(p),pdbSize(0),goalState(s)
+	:env(e),pattern(p),locs(p),pdbSize(0),goalState(s)
 {
 	uint64_t r;
 	GetPDBRankFromState(s, r);
@@ -260,7 +260,6 @@ void SlidingTilePuzzlePDB::GetPDBRankFromState(const SlidingTilePuzzleState& sta
 	int K = ssize - psize;
 
 
-	std::vector<int> locs(pattern.size());
 	for (int i = 0; i < psize;i++)
 		for (int j = 0; j < ssize; j++)
 			if (state.puzzle[j] == pattern[i])

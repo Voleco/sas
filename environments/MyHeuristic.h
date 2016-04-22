@@ -14,7 +14,7 @@ template <class state>
 class MaxHeuristic
 {
 public:
-	MaxHeuristic(std::vector<MyHeuristic<state>*> h):heurs(h){}
+	MaxHeuristic(std::vector<MyHeuristic<state>*> h) :heurs(h) {}
 	int GetHCost(state &s);
 
 protected:
@@ -25,9 +25,14 @@ template<class state>
 int MaxHeuristic<state>::GetHCost(state & s)
 {
 	int max = 0;
+	int hcost = 0;
+
 	for (int i = 0; i < heurs.size(); i++)
-		if (heurs[i]->GetHCost(s)>max)
-			max = heurs[i]->GetHCost(s);
+	{
+		hcost = heurs[i]->GetHCost(s);
+		if (hcost>max)
+			max = hcost;
+	}	
 	return max;
 }
 

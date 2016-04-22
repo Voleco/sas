@@ -169,8 +169,9 @@ public:
 	SlidingTilePuzzlePDB(SlidingTilePuzzle e, SlidingTilePuzzleState s, std::vector<int> p);
 	SlidingTilePuzzlePDB() {}
 	SlidingTilePuzzlePDB(const SlidingTilePuzzlePDB& s) 
-		:env(s.env),goalState(s.goalState),pattern(s.pattern),pdbSize(s.pdbSize),pdbData(s.pdbData)
-	{}
+		:env(s.env),goalState(s.goalState),pattern(s.pattern), locs(s.locs),pdbSize(s.pdbSize),pdbData(s.pdbData)
+	{
+	}
 	~SlidingTilePuzzlePDB() {}
 
 	int GetHCost(SlidingTilePuzzleState& s);
@@ -195,7 +196,7 @@ protected:
 	std::vector<int> pattern;
 	uint64_t pdbSize;
 	std::vector<uint8_t> pdbData;
-
+	std::vector<int> locs;
 };
 
 
