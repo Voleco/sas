@@ -36,7 +36,7 @@ int main(int argc,char** argv)
 		std::cout << "retrieved state: " << start << "\n";
 	}
 
-	else if (argc > 1 && strcmp(argv[1], "-buildPDB") == 0)
+	else if (argc > 2 && strcmp(argv[1], "-buildPDB") == 0)
 	{
 		uint64_t rank;
 		SlidingTilePuzzleState goal(4, 4);
@@ -103,7 +103,7 @@ int main(int argc,char** argv)
 
 	}
 
-	else if (argc > 1 && strcmp(argv[1], "-run") == 0)
+	else if (argc > 2 && strcmp(argv[1], "-run") == 0)
 	{
 		bool showPath = false;
 		int low = 1;

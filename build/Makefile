@@ -12,10 +12,6 @@
 PROJECTS = \
   utils	\
   environments \
-  apps/asg1 \
-  apps/asg1test \
-  apps/asg2 \
-  apps/asg2test \
   apps/asg3	\
 
 
@@ -23,10 +19,6 @@ PROJECTS = \
 PROJECTS_ALL = \
   utils	\
   environments \
-  apps/asg1 \
-  apps/asg1test \
-  apps/asg2 \
-  apps/asg2test \
   apps/asg3	\
 
 # sequentially to avoid same sub-target in sub-make invoked twice
