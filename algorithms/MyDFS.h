@@ -14,7 +14,7 @@ public:
 		:MySearchAlgorithm<state, action, environment>(),nodesExpanded(0),maxDepthAllowed(md),duplicateDetection(dd)
 	{
 	}
-	virtual bool GetPath(environment e, state start, state goal);
+	virtual bool GetPath(environment& e, state& start, state& goal);
 	virtual uint64_t GetNodesExpanded() { return nodesExpanded; }
 protected:
 	uint64_t nodesExpanded;
@@ -28,7 +28,7 @@ class MyDFID
 {
 public:
 	MyDFID(bool dd = false,int _maxDepth=0) :totalNodesExpanded(0),maxDepth(_maxDepth),duplicateDetection(dd){}
-	bool GetPath(environment e, state start, state goal);
+	bool GetPath(environment& e, state& start, state& goal);
 	uint64_t GetNodesExpanded() { return totalNodesExpanded; }
 private:
 	uint64_t totalNodesExpanded;
@@ -37,7 +37,7 @@ private:
 };
 
 template <typename state, typename action, typename environment>
-bool MyDFS<state, action, environment>::GetPath(environment e, state start, state goal)
+bool MyDFS<state, action, environment>::GetPath(environment& e, state& start, state& goal)
 {
 	bool found = false;
 
@@ -99,7 +99,7 @@ bool MyDFS<state, action, environment>::GetPath(environment e, state start, stat
 
 
 template <typename state, typename action, typename environment>
-bool MyDFID<state, action, environment>::GetPath(environment e, state start, state goal)
+bool MyDFID<state, action, environment>::GetPath(environment& e, state& start, state& goal)
 {
 	if(maxDepth==0)
 		maxDepth = 1 + e.GetSolutionDepthUpperBound(start, goal);

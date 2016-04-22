@@ -25,18 +25,6 @@ AR = ar
 
 ifeq ($(findstring "Darwin", "$(shell uname -s)"), "Darwin")
 
-ifeq ("$(OPENGL)", "STUB")
-COMMON_CXXFLAGS += -I$(ROOT)/gui/ -I$(ROOT)/gui/GL/ -DNO_OPENGL
-else
-COMMON_LNFLAGS += -framework Foundation -framework AppKit
-COMMON_CXXFLAGS += -DOS_MAC  
-
-COMMON_LNFLAGS += -framework GLUT -framework OpenGL
-COMMON_CXXFLAGS += -I/System/Library/Frameworks/GLUT.framework/Versions/A/Headers/
-COMMON_CXXFLAGS += -I/System/Library/Frameworks/OpenGL.framework/Versions/A/Headers/
-COMMON_CXXFLAGS += -I/System/Library/Frameworks/AGL.framework/Versions/A/Headers/
-endif
-
 else # not darwin
 
 # if Linux need some other pthread call 
@@ -44,13 +32,6 @@ ifeq ($(findstring "Linux", "$(shell uname -s)"), "Linux")
 COMMON_LNFLAGS += -Lapps/libs -L/usr/X11R6/lib64 -L/usr/X11R6/lib -pthread #--stdlib=libstdc++ # -lXi -lXmu
 else
 COMMON_LNFLAGS += -Lapps/libs -L/usr/X11R6/lib64 -L/usr/X11R6/lib -lpthread #--stdlib=libstdc++ # -lXi -lXmu 
-endif
-
-ifeq ("$(OPENGL)", "STUB")
-COMMON_CXXFLAGS += -I$(ROOT)/gui/ -I$(ROOT)/gui/GL/ -DNO_OPENGL
-else
-COMMON_CXXFLAGS += -I/usr/include/GL
-COMMON_LNFLAGS +=  -lGL -lGLU -lglut
 endif
 
 endif

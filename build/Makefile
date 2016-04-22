@@ -10,6 +10,7 @@
 
 # All projects to build in this order.
 PROJECTS = \
+  utils	\
   environments \
   apps/asg1 \
   apps/asg1test \
@@ -20,6 +21,7 @@ PROJECTS = \
 
 # Include projects with broken compilation
 PROJECTS_ALL = \
+  utils	\
   environments \
   apps/asg1 \
   apps/asg1test \

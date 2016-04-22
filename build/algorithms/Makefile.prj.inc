@@ -17,15 +17,22 @@ REL_OBJDIR = $(ROOT)/objs/$(NAME)/release
 DBG_BINDIR = $(ROOT)/bin/debug
 REL_BINDIR = $(ROOT)/bin/release
 
-PROJ_CXXFLAGS = -I$(ROOT)/algorithms
+PROJ_CXXFLAGS = -I$(ROOT)/utils -I$(ROOT)/algorithms 
 PROJ_DBG_CXXFLAGS = $(PROJ_CXXFLAGS)
 PROJ_REL_CXXFLAGS = $(PROJ_CXXFLAGS)
 
-PROJ_DBG_LNFLAGS =
-PROJ_REL_LNFLAGS =
+PROJ_DBG_LIB =  -lutils -lenvironments 
+PROJ_REL_LIB =  -lutils -lenvironments 
 
-PROJ_DBG_LIB =
-PROJ_REL_LIB =
+
+PROJ_DBG_DEP = \
+  $(DBG_BINDIR)/libutils.a \
+  $(DBG_BINDIR)/libenvironments.a \
+
+
+PROJ_REL_DEP = \
+  $(REL_BINDIR)/libutils.a \
+  $(REL_BINDIR)/libenvironments.a \
 
 default : all
 
