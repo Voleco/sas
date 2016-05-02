@@ -65,6 +65,7 @@ public:
 	void GetActions(GridBasedMapState &nodeID, std::vector<GridBasedMapAction> &actions);
 	void ApplyAction(GridBasedMapState &s, GridBasedMapAction a);
 	void UndoAction(GridBasedMapState &s, GridBasedMapAction a);
+	GridBasedMapAction GetInvertAction(const GridBasedMapAction& a) { return -1; };
 	unsigned int GetDepth(GridBasedMapState &s);
 	unsigned int GetSolutionDepthUpperBound(GridBasedMapState &s, GridBasedMapState &g);
 

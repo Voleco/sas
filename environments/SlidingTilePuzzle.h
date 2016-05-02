@@ -142,10 +142,10 @@ public:
 class SlidingTilePuzzle : public MyEnvironment<SlidingTilePuzzleState, SlidingTilePuzzleAction> 
 {
 public:
-	SlidingTilePuzzle() { historyActions.push(-1); }
-	SlidingTilePuzzle(unsigned int w, unsigned int h, bool _allow_move_back=false):width(w),height(h),allowMoveBack(_allow_move_back) { historyActions.push(-1); }
+	SlidingTilePuzzle() {  }
+	SlidingTilePuzzle(unsigned int w, unsigned int h):width(w),height(h){  }
 	SlidingTilePuzzle(const SlidingTilePuzzle& s)
-		:width(s.width),height(s.height),allowMoveBack(s.allowMoveBack),historyActions(s.historyActions)
+		:width(s.width),height(s.height)
 	{}
 	~SlidingTilePuzzle() {}
 
@@ -153,14 +153,14 @@ public:
 	void ApplyAction(SlidingTilePuzzleState &s, SlidingTilePuzzleAction a);
 	void UndoAction(SlidingTilePuzzleState &s, SlidingTilePuzzleAction a);
 
-
+	SlidingTilePuzzleAction GetInvertAction(const SlidingTilePuzzleAction& a);
 
 	void GetRankFromState(const SlidingTilePuzzleState& state, uint64_t& rank);
 	void GetStateFromRank(SlidingTilePuzzleState& state, const uint64_t& rank);
-	std::stack<SlidingTilePuzzleAction> historyActions;
+
 	unsigned int width;
 	unsigned int height;
-	bool allowMoveBack;
+
 };
 
 class SlidingTilePuzzlePDB :public MyHeuristic<SlidingTilePuzzleState>

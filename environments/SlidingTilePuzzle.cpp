@@ -33,17 +33,13 @@ void SlidingTilePuzzle::GetActions(SlidingTilePuzzleState& nodeID, std::vector<S
 	
 	//std::cout << "\n************state geting actions:\n" << nodeID;
 	//std::cout << "node blankidx: " << nodeID.blankIdx << "node width" << nodeID.width << "\n";
-	if ((nodeID.blankIdx % nodeID.width < nodeID.width - 1) 
-		&& (historyActions.top()!=Left))
+	if (nodeID.blankIdx % nodeID.width < nodeID.width - 1)
 		actions.push_back(Right);
-	if ((nodeID.blankIdx % nodeID.width > 0)
-		&& (historyActions.top() != Right))
+	if (nodeID.blankIdx % nodeID.width > 0)
 		actions.push_back(Left);
-	if ((nodeID.blankIdx >= nodeID.width)
-		&&(historyActions.top() != Down))
+	if (nodeID.blankIdx >= nodeID.width)
 		actions.push_back(Up);
-	if ((nodeID.blankIdx < nodeID.width*(nodeID.height-1))
-		&&(historyActions.top() != Up))
+	if (nodeID.blankIdx < nodeID.width*(nodeID.height-1))
 		actions.push_back(Down);
 
 	
@@ -77,15 +73,16 @@ void SlidingTilePuzzle::ApplyAction(SlidingTilePuzzleState& s, SlidingTilePuzzle
 	}
 
 #ifdef ASGS
-	s.hCost -= distances[s.puzzle[inx]][inx];
-	s.hCost += distances[s.puzzle[inx]][s.blankIdx];
+	if (s.puzzle[inx] != -1)
+	{
+		s.hCost -= distances[s.puzzle[inx]][inx];
+		s.hCost += distances[s.puzzle[inx]][s.blankIdx];
+	}
 #endif
 
 	s.puzzle[s.blankIdx] = s.puzzle[inx];
 	s.puzzle[inx] = 0;
 	s.blankIdx = inx;
-	if (allowMoveBack == false)
-		historyActions.push(a);
 	//std::cout << "state applied actions:\n" << s;
 }
 
@@ -113,16 +110,39 @@ void SlidingTilePuzzle::UndoAction(SlidingTilePuzzleState& s, SlidingTilePuzzleA
 	}
 
 #ifdef ASGS
-	s.hCost -= distances[s.puzzle[inx]][inx];
-	s.hCost += distances[s.puzzle[inx]][s.blankIdx];
+	if (s.puzzle[inx] != -1)
+	{
+		s.hCost -= distances[s.puzzle[inx]][inx];
+		s.hCost += distances[s.puzzle[inx]][s.blankIdx];
+	}
 #endif
 
 	s.puzzle[s.blankIdx] = s.puzzle[inx];
 	s.puzzle[inx] = 0;
 	s.blankIdx = inx;
-	if (allowMoveBack == false)
-		historyActions.pop();
 	//std::cout << "state undid actions:\n" << s;
+}
+
+SlidingTilePuzzleAction SlidingTilePuzzle::GetInvertAction(const SlidingTilePuzzleAction& a)
+{
+	switch (a)
+	{
+	case Right:
+		return Left;
+		break;
+	case Up:
+		return Down;
+		break;
+	case Left:
+		return Right;
+		break;
+	case Down:
+		return Up;
+		break;
+	default:
+		break;
+	}
+	return -1;
 }
 
 #ifdef Lexicographical_ranking

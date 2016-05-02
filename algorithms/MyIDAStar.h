@@ -67,6 +67,9 @@ bool MyIDAStar<state, action, environment, heuristic>::GetPathWithinF(environmen
 	e.GetActions(start, actions);
 	for (int i = 0; i < actions.size(); i++)
 	{
+		if (!actionSequence.empty() && 
+			e.GetInvertAction(actions[i]) == actionSequence.top())
+			continue;
 		e.ApplyAction(start, actions[i]);
 		actionSequence.push(actions[i]);
 		nodesExpanded++;
