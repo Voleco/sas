@@ -4,19 +4,33 @@
 
 #include <vector>
 #include <stack>
-#include <map>
-#include <unordered_set>
+#include <queue>
 #include "MySearchAlgorithm.h"
 
 #define MINUMUM_F 10000
 
 //this algorithm assume unit edge cost
 
-struct StateInfo {
+template<typename state>
+struct StateWithInfo {
+	state s;
 	int gcost;
 	int hcost;
 };
 
+template<typename state>
+struct comparator {
+	bool operator()(const StateWithInfo& i, const StateWithInfo& j) {
+		if (i.gcost + i.hcost > j.gcost + j.hcost)
+			return true;
+		else if (i.gcost + i.hcost < j.gcost + j.hcost)
+			return false;
+		else//i.gcost + i.hcost == j.gcost + j.hcost
+		{
+			return i.gcost > j.gcost;
+		}
+	}
+};
 
 
 template <typename state, typename action, typename environment, typename heuristic>
@@ -34,8 +48,9 @@ public:
 protected:
 	uint64_t nodesExpanded;
 	heuristic heur;
-	std::map<state,StateInfo> openList;
-	std::map<state,StateInfo> closedList;
+	//openList is acctually a min heap
+	std::priority_queue<StateWithInfo<state>, std::vector<StateWithInfo<state>>, comparator> openList;
+	std::vector<StateWithInfo<state>> closedList;
 	int solutionCost;
 };
 
@@ -43,40 +58,32 @@ protected:
 template <typename state, typename action, typename environment, typename heuristic>
 bool MyAStar<state, action, environment, heuristic>::GetPath(environment& e, state& start, state& goal)
 {
-	StateInfo info;
+	StateWithInfo<state> info;
 	info.gcost = 0;
 	info.hcost = heur.GetHCost(start);
-	openList[start] = info;
-	state next;
-	typename std::map<state, StateInfo>::iterator it;
+	info.s = start;
+	openList.push(info);
+	//openList.
+	StateWithInfo<state> next;
+	//typename std::map<state, StateInfo>::iterator it;
 	while (!openList.empty())
 	{
 		//choose best node from openlist;
-		int minF = MINUMUM_F;
-		for (it = openList.begin(); it != openList.end();it++)
-		{
-			if (it->second.gcost + it->second.hcost < minF)
-			{
-				minF = it->second.gcost + it->second.hcost;
-				next = it->first;
-				info = it->second;
-			}
-		}
+		next = openList.top();
 		//remove it from open, add it to closed
-		it = openList.find(next);
-		closedList[it->first] = it->second;
-		openList.erase(openList.find(next));
+		openList.pop();
+		closedList.insert(next);
 
 		nodesExpanded++;
 		//we can do solution detection here, as DSD
 
 		std::vector<action> actions;
-		e.GetActions(next, actions);
+		e.GetActions(next.s, actions);
 		for (int i = 0; i < actions.size(); i++)
 		{
-			e.ApplyAction(next, actions[i]);
+			e.ApplyAction(next.s, actions[i]);
 			//we can do solution here, as ISD
-			if (next == goal)
+			if (next.s == goal)
 			{
 				solutionCost = info.gcost + 1;
 				return true;
