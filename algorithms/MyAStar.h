@@ -1,6 +1,6 @@
 
-#ifndef MY_INEFFICIENT_ASTAR_H
-#define MY_INEFFICIENT_ASTAR_H
+#ifndef MY_ASTAR_H
+#define MY_ASTAR_H
 
 #include <vector>
 #include <stack>
@@ -20,10 +20,10 @@ struct StateInfo {
 
 
 template <typename state, typename action, typename environment, typename heuristic>
-class MyInefficientAStar :public MySearchAlgorithm<state, action, environment>
+class MyAStar :public MySearchAlgorithm<state, action, environment>
 {
 public:
-	MyInefficientAStar(heuristic& h)
+	MyAStar(heuristic& h)
 		:MySearchAlgorithm<state, action, environment>(), nodesExpanded(0), heur(h), solutionCost(MINUMUM_F)
 	{
 	}
@@ -41,7 +41,7 @@ protected:
 
 
 template <typename state, typename action, typename environment, typename heuristic>
-bool MyInefficientAStar<state, action, environment, heuristic>::GetPath(environment& e, state& start, state& goal)
+bool MyAStar<state, action, environment, heuristic>::GetPath(environment& e, state& start, state& goal)
 {
 	StateInfo info;
 	info.gcost = 0;
@@ -108,4 +108,4 @@ bool MyInefficientAStar<state, action, environment, heuristic>::GetPath(environm
 	return false;
 }
 
-#endif // ! MY_INEFFICIENT_ASTAR_H
+#endif // ! MY_ASTAR_H

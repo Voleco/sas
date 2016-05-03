@@ -92,6 +92,33 @@ static bool operator==(const SlidingTilePuzzleState &s1, const SlidingTilePuzzle
 	return true;
 }
 
+static bool operator<(const SlidingTilePuzzleState &s1, const SlidingTilePuzzleState &s2)
+{
+	//WARNING: assume s1 and s2 of same size
+	for (int i = 0; i < s1.puzzle.size(); i++)
+	{
+		if (s1.puzzle[i] < s2.puzzle[i])
+			return true;
+		else if (s1.puzzle[i] > s2.puzzle[i])
+			return false;
+	}
+	return false;
+}
+
+namespace std {
+	template<>
+	struct hash<SlidingTilePuzzleState>
+	{
+		std::size_t operator()(const SlidingTilePuzzleState& s) const
+		{
+			using std::hash;
+			size_t res = hash<unsigned int>()(s.blankIdx);
+			res = res | (hash<int>()(s.puzzle[0]) << 10);
+			res = res | (hash<int>()(s.puzzle[s.puzzle.size() - 1]) << 20);
+			return res;
+		}
+	};
+}
 
 static std::ostream& operator <<(std::ostream & out, const SlidingTilePuzzleState &s)
 {
