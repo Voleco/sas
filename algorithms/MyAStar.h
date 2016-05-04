@@ -5,29 +5,28 @@
 #include <vector>
 #include <stack>
 #include <queue>
+#include <unordered_map>
+#include <unordered_set>
 #include "MySearchAlgorithm.h"
-
-#define MINUMUM_F 10000
+#include "MyBinaryHeap.h"
 
 //this algorithm assume unit edge cost
 
-template<typename state>
-struct StateWithInfo {
-	state s;
+struct StateInfo {
 	int gcost;
 	int hcost;
 };
 
-template<typename state>
-struct comparator {
-	bool operator()(const StateWithInfo& i, const StateWithInfo& j) {
-		if (i.gcost + i.hcost > j.gcost + j.hcost)
+
+struct StateInfoLess {
+	bool operator()(const StateInfo& i, const StateInfo& j) {
+		if (i.gcost + i.hcost < j.gcost + j.hcost)
 			return true;
-		else if (i.gcost + i.hcost < j.gcost + j.hcost)
+		else if (i.gcost + i.hcost > j.gcost + j.hcost)
 			return false;
 		else//i.gcost + i.hcost == j.gcost + j.hcost
 		{
-			return i.gcost > j.gcost;
+			return i.gcost < j.gcost;
 		}
 	}
 };
@@ -49,8 +48,8 @@ protected:
 	uint64_t nodesExpanded;
 	heuristic heur;
 	//openList is acctually a min heap
-	std::priority_queue<StateWithInfo<state>, std::vector<StateWithInfo<state>>, comparator> openList;
-	std::vector<StateWithInfo<state>> closedList;
+	MyBinaryHeap<StateInfo, uint64_t, StateInfoLess> openList;
+	std::vector<uint64_t> closedList;
 	int solutionCost;
 };
 
@@ -58,56 +57,72 @@ protected:
 template <typename state, typename action, typename environment, typename heuristic>
 bool MyAStar<state, action, environment, heuristic>::GetPath(environment& e, state& start, state& goal)
 {
-	StateWithInfo<state> info;
+	if (start == goal)
+	{
+		solutionCost = 0;
+		nodesExpanded = 1;
+		return true;
+	}
+		
+	StateInfo info;
 	info.gcost = 0;
 	info.hcost = heur.GetHCost(start);
-	info.s = start;
-	openList.push(info);
+	uint64_t startRank;
+	e.GetRankFromState(start, startRank);
+	openList.Insert(info, startRank);
 	//openList.
-	StateWithInfo<state> next;
+	uint64_t next;
 	//typename std::map<state, StateInfo>::iterator it;
-	while (!openList.empty())
+	while (!openList.Empty())
 	{
 		//choose best node from openlist;
-		next = openList.top();
+		next = openList.ExtractMin();
+		info = openList.MinKey();
 		//remove it from open, add it to closed
-		openList.pop();
-		closedList.insert(next);
+		openList.DeleteMin();
+		closedList.push_back(next);
 
 		nodesExpanded++;
 		//we can do solution detection here, as DSD
 
+		state s;
+		e.GetStateFromRank(s, next);
 		std::vector<action> actions;
-		e.GetActions(next.s, actions);
+		e.GetActions(s, actions);
 		for (int i = 0; i < actions.size(); i++)
 		{
-			e.ApplyAction(next.s, actions[i]);
+			state successor = s;
+			e.ApplyAction(successor, actions[i]);
 			//we can do solution here, as ISD
-			if (next.s == goal)
+			if (successor == goal)
 			{
 				solutionCost = info.gcost + 1;
 				return true;
 			}
 
-
 			//this state is ungenerated (or on closed, if inconsistent heuristic)
 			//in this case, we need add it to open
-			if (openList.find(next) == openList.end())
+			StateInfo succinfo;
+			succinfo.gcost = info.gcost + 1;
+			
+			uint64_t succrank;
+			e.GetRankFromState(successor, succrank);
+			if (!openList.IsExist(succrank))
 			{
-				StateInfo nextInfo;
-				nextInfo.hcost = heur.GetHCost(next);
-				//assume unit edge cost for now
-				nextInfo.gcost = info.gcost + 1;
-				openList[next] = nextInfo;
+				succinfo.hcost = heur.GetHCost(successor);
+				openList.Insert(succinfo, succrank);
 			}
 			//in this case, this state is already on open. We may need to update its gcost 
 			else
 			{
-				if (openList[next].gcost > info.gcost + 1)
-					openList[next].gcost = info.gcost+1;
+				StateInfo preinfo = openList.GetKey(succrank);
+				if (preinfo.gcost > succinfo.gcost)
+				{
+					succinfo.hcost = preinfo.hcost;
+					openList.DecreaseKey(succinfo, succrank);
+				}
 			}
-
-			e.UndoAction(next, actions[i]);
+			//since we make a copy of the state, we dont need operate UndoAction
 		}
 	}
 

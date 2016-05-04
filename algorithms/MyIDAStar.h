@@ -61,6 +61,7 @@ bool MyIDAStar<state, action, environment, heuristic>::GetPathWithinF(environmen
 
 		return false;
 	}
+	nodesExpanded++;
 	if (start == goal)
 		return true;
 	std::vector<action> actions;
@@ -72,7 +73,7 @@ bool MyIDAStar<state, action, environment, heuristic>::GetPathWithinF(environmen
 			continue;
 		e.ApplyAction(start, actions[i]);
 		actionSequence.push(actions[i]);
-		nodesExpanded++;
+		
 
 		if (GetPathWithinF(e, start, goal, f, gcost + 1))
 			return true;
