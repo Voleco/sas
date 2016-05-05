@@ -17,7 +17,11 @@ struct StateInfo {
 	int hcost;
 };
 
-
+static std::ostream& operator <<(std::ostream & out, const StateInfo &s)
+{
+	out <<"f: "<<s.gcost+s.hcost<< ", g: " << s.gcost << ", h: " << s.hcost;
+	return out;
+}
 
 template <typename state, typename action, typename environment, typename heuristic>
 class MyInefficientAStar :public MySearchAlgorithm<state, action, environment>
@@ -43,6 +47,12 @@ protected:
 template <typename state, typename action, typename environment, typename heuristic>
 bool MyInefficientAStar<state, action, environment, heuristic>::GetPath(environment& e, state& start, state& goal)
 {
+	if (start == goal)
+	{
+		solutionCost = 0;
+		nodesExpanded = 1;
+		return true;
+	}
 	StateInfo info;
 	info.gcost = 0;
 	info.hcost = heur.GetHCost(start);

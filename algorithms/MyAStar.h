@@ -9,24 +9,29 @@
 #include <unordered_set>
 #include "MySearchAlgorithm.h"
 #include "MyBinaryHeap.h"
+#include "MyInefficientAStar.h"
 
 //this algorithm assume unit edge cost
 
+//StateInfo is defined in MyInefficientAStar.h
+//TODO use namespace
+/*
 struct StateInfo {
 	int gcost;
 	int hcost;
 };
-
+*/
 
 struct StateInfoLess {
 	bool operator()(const StateInfo& i, const StateInfo& j) {
 		if (i.gcost + i.hcost < j.gcost + j.hcost)
 			return true;
+//		return false;
 		else if (i.gcost + i.hcost > j.gcost + j.hcost)
 			return false;
 		else//i.gcost + i.hcost == j.gcost + j.hcost
 		{
-			return i.gcost < j.gcost;
+			return i.gcost > j.gcost;
 		}
 	}
 };
@@ -87,11 +92,14 @@ bool MyAStar<state, action, environment, heuristic>::GetPath(environment& e, sta
 
 		state s;
 		e.GetStateFromRank(s, next);
+		//std::cout << "\n***********exbanding*****************\nstate: " << s;
+		//std::cout << "rank" << next << "\n";
+		//std::cout << "info: " << info<<"\n";
 		std::vector<action> actions;
 		e.GetActions(s, actions);
 		for (int i = 0; i < actions.size(); i++)
 		{
-			state successor = s;
+			state successor(s);
 			e.ApplyAction(successor, actions[i]);
 			//we can do solution here, as ISD
 			if (successor == goal)
@@ -99,14 +107,17 @@ bool MyAStar<state, action, environment, heuristic>::GetPath(environment& e, sta
 				solutionCost = info.gcost + 1;
 				return true;
 			}
-
+			//std::cout << "\nsucc: " << successor << "\n";
 			//this state is ungenerated (or on closed, if inconsistent heuristic)
 			//in this case, we need add it to open
 			StateInfo succinfo;
 			succinfo.gcost = info.gcost + 1;
-			
+			//succinfo.hcost = heur.GetHCost(successor);
 			uint64_t succrank;
 			e.GetRankFromState(successor, succrank);
+			//std::cout << "succ: " << successor;
+			//std::cout << "succinfo " << succinfo << "\n";
+			//std::cout << "succrank: " << succrank<<"\n";
 			if (!openList.IsExist(succrank))
 			{
 				succinfo.hcost = heur.GetHCost(successor);
@@ -122,7 +133,8 @@ bool MyAStar<state, action, environment, heuristic>::GetPath(environment& e, sta
 					openList.DecreaseKey(succinfo, succrank);
 				}
 			}
-			//since we make a copy of the state, we dont need operate UndoAction
+			
+			e.UndoAction(successor, actions[i]);
 		}
 	}
 

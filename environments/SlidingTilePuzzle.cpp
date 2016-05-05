@@ -206,18 +206,13 @@ void SlidingTilePuzzle::GetRankFromState(const SlidingTilePuzzleState& state, ui
 	}
 	rank = 0;
 	int s = 0;
-	int tmp = 0;
 	for (int n = size; n > 0; n--)
 	{
 		s = Pi.puzzle[n - 1];
 		//swap Pi[n-1], Pi[Pi^-1[n-1]]
-		tmp = Pi.puzzle[n - 1];
-		Pi.puzzle[n - 1] = Pi.puzzle[dual[n - 1]];
-		Pi.puzzle[dual[n - 1]] = tmp;
+		std::swap(Pi.puzzle[n - 1], Pi.puzzle[dual[n - 1]]);
 		//swap Pi^-1[s], Pi^-1[n-1]
-		tmp = dual[s];
-		dual[s] = dual[n - 1];
-		dual[n - 1] = tmp;
+		std::swap(dual[n - 1], dual[s]);
 
 		rank += s*Factorial(n - 1);
 	}
@@ -234,9 +229,7 @@ void SlidingTilePuzzle::GetStateFromRank(SlidingTilePuzzleState& state, const ui
 		s = r / Factorial(n-1);
 		r = r % Factorial(n-1);
 		//swap state.puzzle[index] with state.puzzle[n-1]
-		int tmp = state.puzzle[n-1];
-		state.puzzle[n - 1] = state.puzzle[s];
-		state.puzzle[s] = tmp;
+		std::swap(state.puzzle[n - 1], state.puzzle[s]);
 	}
 	for (int i = 0; i < width*height;i++)
 		if (state.puzzle[i] == 0)
@@ -454,7 +447,7 @@ int SlidingTilePuzzlePDB::GetHCost(SlidingTilePuzzleState& s)
 
 void GetSildingTileInstance(int index, SlidingTilePuzzleState& s)
 {
-	int instances[100][16] =
+	int instances[110][16] =
 	{
 		{ 14, 13, 15, 7, 11, 12, 9, 5, 6, 0, 2, 1, 4, 8, 10, 3 },
 		{ 13, 5, 4, 10, 9, 12, 8, 14, 2, 3, 7, 1, 0, 15, 11, 6 },
@@ -555,7 +548,19 @@ void GetSildingTileInstance(int index, SlidingTilePuzzleState& s)
 		{ 9, 14, 5, 7, 8, 15, 1, 2, 10, 4, 13, 6, 12, 0, 11, 3 },
 		{ 0, 11, 3, 12, 5, 2, 1, 9, 8, 10, 14, 15, 7, 4, 13, 6 },
 		{ 7, 15, 4, 0, 10, 9, 2, 5, 12, 11, 13, 6, 1, 3, 14, 8 },
-		{ 11, 4, 0, 8, 6, 10, 5, 13, 12, 7, 14, 3, 1, 2, 9, 15 } };
+		{ 11, 4, 0, 8, 6, 10, 5, 13, 12, 7, 14, 3, 1, 2, 9, 15 },
+			//easy ones
+		{ 4, 1, 2, 3, 9, 8, 6, 7, 12, 5, 10, 11, 13, 0, 14, 15 },
+		{ 4, 1, 2, 3, 5, 6, 10, 7, 8, 9, 14, 11, 12, 0, 13, 15 },
+		{ 4, 1, 2, 3, 8, 0, 6, 7, 9, 5, 10, 11, 12, 13, 14, 15 },
+		{ 1, 2, 6, 3, 4, 5, 10, 7, 8, 9, 11, 15, 12, 13, 14, 0 },
+		{ 4, 1, 2, 3, 8, 0, 6, 7, 9, 5, 10, 11, 12, 13, 14, 15 },
+		{ 5, 4, 2, 3, 1, 0, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 },
+		{ 1, 2, 3, 7, 4, 5, 6, 11, 8, 9, 14, 10, 12, 0, 13, 15 },
+		{ 4, 1, 2, 3, 5, 6, 7, 0, 8, 9, 10, 11, 12, 13, 14, 15 },
+		{ 4, 1, 2, 3, 5, 6, 7, 0, 8, 9, 10, 11, 12, 13, 14, 15 },
+		{ 1, 5, 2, 3, 4, 9, 6, 7, 0, 13, 10, 11, 8, 12, 14, 15 }
+ };
 
 	for (int i = 0; i < 16; i++)
 	{

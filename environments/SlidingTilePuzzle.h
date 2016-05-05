@@ -17,7 +17,7 @@
 #define Myrvold_Ruskey_ranking
 //#define Lexicographical_ranking
 
-#define ASGS
+//#define ASGS
 
 uint64_t Factorial(int val);
 uint64_t FactorialN_K(int n, int k);
