@@ -62,12 +62,6 @@ protected:
 template <typename state, typename action, typename environment, typename heuristic>
 bool MyAStar<state, action, environment, heuristic>::GetPath(environment& e, state& start, state& goal)
 {
-	if (start == goal)
-	{
-		solutionCost = 0;
-		nodesExpanded = 1;
-		return true;
-	}
 		
 	StateInfo info;
 	info.gcost = 0;
@@ -88,11 +82,15 @@ bool MyAStar<state, action, environment, heuristic>::GetPath(environment& e, sta
 		closedList.insert(next);
 
 		nodesExpanded++;
-		//we can do solution detection here, as DSD
 
-		//state s;
 		state successor;
 		e.GetStateFromRank(successor, next);
+		//we can do solution detection here, as DSD
+		if (successor == goal)
+		{
+			solutionCost = info.gcost;
+			return true;
+		}
 		//std::cout << "\n***********exbanding*****************\nstate: " << successor;
 		//std::cout << "rank" << next << "\n";
 		//std::cout << "info: " << info<<"\n";
@@ -102,15 +100,14 @@ bool MyAStar<state, action, environment, heuristic>::GetPath(environment& e, sta
 		{
 			//state successor(s);
 			e.ApplyAction(successor, actions[i]);
+			double edgeCost = e.GetActionCost(actions[i]);
 			//we can do solution here, as ISD
-			if (successor == goal)
-			{
-				solutionCost = info.gcost + 1;
-				return true;
-			}
+			//however, ISD would be more complicated with non-unit edge cost
+			//TODO use ISD
+
 			//std::cout << "\nsucc: " << successor << "\n";
 			StateInfo succinfo;
-			succinfo.gcost = info.gcost + 1;
+			succinfo.gcost = info.gcost + edgeCost;
 			//succinfo.hcost = heur.GetHCost(successor);
 			uint64_t succrank;
 			e.GetRankFromState(successor, succrank);

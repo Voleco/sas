@@ -13,8 +13,8 @@
 //this algorithm assume unit edge cost
 
 struct StateInfo {
-	int gcost;
-	int hcost;
+	double gcost;
+	double hcost;
 };
 
 static std::ostream& operator <<(std::ostream & out, const StateInfo &s)

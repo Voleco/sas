@@ -78,7 +78,7 @@ public:
 	std::vector<int> puzzle;
 	unsigned int blankIdx;
 #ifdef ASGS
-	int hCost;
+	double hCost;
 #endif // ASGS
 };
 
@@ -161,7 +161,7 @@ public:
 	ManhattanDistanceHeuristic() { }
 	~ManhattanDistanceHeuristic() {}
 	void SetGoal(SlidingTilePuzzleState& s) { goal = s; }
-	int GetHCost(SlidingTilePuzzleState& s);
+	double GetHCost(SlidingTilePuzzleState& s);
 	SlidingTilePuzzleState goal;
 };
 
@@ -181,6 +181,7 @@ public:
 	void UndoAction(SlidingTilePuzzleState &s, SlidingTilePuzzleAction a);
 
 	SlidingTilePuzzleAction GetInvertAction(const SlidingTilePuzzleAction& a);
+	double GetActionCost(const SlidingTilePuzzleAction& a) { return 1; }
 
 	void GetRankFromState(const SlidingTilePuzzleState& state, uint64_t& rank);
 	void GetStateFromRank(SlidingTilePuzzleState& state, const uint64_t& rank);
@@ -201,7 +202,7 @@ public:
 	}
 	~SlidingTilePuzzlePDB() {}
 
-	int GetHCost(SlidingTilePuzzleState& s);
+	double GetHCost(SlidingTilePuzzleState& s);
 
 	uint64_t GetPDBSize() const { return pdbSize; }
 

@@ -1,12 +1,12 @@
 
 #include "SlidingTilePuzzle.h"
 
-int ManhattanDistanceHeuristic::GetHCost(SlidingTilePuzzleState& s)
+double ManhattanDistanceHeuristic::GetHCost(SlidingTilePuzzleState& s)
 {
 #ifdef ASGS
 	return s.hCost;
 #endif
-	int hcost = 0;
+	double hcost = 0;
 	int xdiff = 0;
 	int ydiff = 0;
 	int size = s.puzzle.size();
@@ -218,7 +218,7 @@ void SlidingTilePuzzle::GetRankFromState(const SlidingTilePuzzleState& state, ui
 	}
 #ifdef ASGS
 	rank = rank << 8;
-	rank = rank + state.hCost;
+	rank = rank + (int)state.hCost;
 #endif
 
 }
@@ -231,7 +231,7 @@ void SlidingTilePuzzle::GetStateFromRank(SlidingTilePuzzleState& state, const ui
 #ifdef ASGS
 	int h = r & 0x00000000000000FF;
 	r = r >> 8;
-	state.hCost = h;
+	state.hCost = (double)h;
 #endif // ASGS
 
 	for (int n = width*height ; n > 0; n--)
@@ -447,11 +447,11 @@ bool SlidingTilePuzzlePDB::Load(const char* prefix)
 	return true;
 }
 
-int SlidingTilePuzzlePDB::GetHCost(SlidingTilePuzzleState& s)
+double SlidingTilePuzzlePDB::GetHCost(SlidingTilePuzzleState& s)
 {
 	uint64_t index;
 	GetPDBRankFromState(s, index);
-	return pdbData[index];
+	return (double)pdbData[index];
 }
 
 
