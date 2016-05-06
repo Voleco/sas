@@ -216,6 +216,10 @@ void SlidingTilePuzzle::GetRankFromState(const SlidingTilePuzzleState& state, ui
 
 		rank += s*Factorial(n - 1);
 	}
+#ifdef ASGS
+	rank = rank << 8;
+	rank = rank + state.hCost;
+#endif
 
 }
 void SlidingTilePuzzle::GetStateFromRank(SlidingTilePuzzleState& state, const uint64_t& rank)
@@ -224,6 +228,12 @@ void SlidingTilePuzzle::GetStateFromRank(SlidingTilePuzzleState& state, const ui
 	state.Reset();
 	int s = 0;
 	uint64_t r = rank;
+#ifdef ASGS
+	int h = r & 0x00000000000000FF;
+	r = r >> 8;
+	state.hCost = h;
+#endif // ASGS
+
 	for (int n = width*height ; n > 0; n--)
 	{
 		s = r / Factorial(n-1);
@@ -237,6 +247,7 @@ void SlidingTilePuzzle::GetStateFromRank(SlidingTilePuzzleState& state, const ui
 			state.blankIdx = i;
 			break;
 		}
+
 }
 #endif
 

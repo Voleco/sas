@@ -54,7 +54,7 @@ protected:
 	heuristic heur;
 	//openList is acctually a min heap
 	MyBinaryHeap<StateInfo, uint64_t, StateInfoLess> openList;
-	std::vector<uint64_t> closedList;
+	std::unordered_set<uint64_t> closedList;
 	int solutionCost;
 };
 
@@ -85,21 +85,22 @@ bool MyAStar<state, action, environment, heuristic>::GetPath(environment& e, sta
 		info = openList.MinKey();
 		//remove it from open, add it to closed
 		openList.DeleteMin();
-		closedList.push_back(next);
+		closedList.insert(next);
 
 		nodesExpanded++;
 		//we can do solution detection here, as DSD
 
-		state s;
-		e.GetStateFromRank(s, next);
-		//std::cout << "\n***********exbanding*****************\nstate: " << s;
+		//state s;
+		state successor;
+		e.GetStateFromRank(successor, next);
+		//std::cout << "\n***********exbanding*****************\nstate: " << successor;
 		//std::cout << "rank" << next << "\n";
 		//std::cout << "info: " << info<<"\n";
 		std::vector<action> actions;
-		e.GetActions(s, actions);
+		e.GetActions(successor, actions);
 		for (int i = 0; i < actions.size(); i++)
 		{
-			state successor(s);
+			//state successor(s);
 			e.ApplyAction(successor, actions[i]);
 			//we can do solution here, as ISD
 			if (successor == goal)
@@ -108,8 +109,6 @@ bool MyAStar<state, action, environment, heuristic>::GetPath(environment& e, sta
 				return true;
 			}
 			//std::cout << "\nsucc: " << successor << "\n";
-			//this state is ungenerated (or on closed, if inconsistent heuristic)
-			//in this case, we need add it to open
 			StateInfo succinfo;
 			succinfo.gcost = info.gcost + 1;
 			//succinfo.hcost = heur.GetHCost(successor);
@@ -120,8 +119,13 @@ bool MyAStar<state, action, environment, heuristic>::GetPath(environment& e, sta
 			//std::cout << "succrank: " << succrank<<"\n";
 			if (!openList.IsExist(succrank))
 			{
-				succinfo.hcost = heur.GetHCost(successor);
-				openList.Insert(succinfo, succrank);
+				//this node is ungenerated
+				if (closedList.find(succrank) == closedList.end())
+				{
+					succinfo.hcost = heur.GetHCost(successor);
+					openList.Insert(succinfo, succrank);
+				}
+				//otherwise this node is expanded. as for consistent heuristic, we can ignore it
 			}
 			//in this case, this state is already on open. We may need to update its gcost 
 			else
