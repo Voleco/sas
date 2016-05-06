@@ -18,6 +18,7 @@ PROJECTS = \
   apps/asg2test \
   apps/asg3	\
   apps/asg4 \
+  apps/asg4test \
 
 
 # Include projects with broken compilation
@@ -30,6 +31,7 @@ PROJECTS_ALL = \
   apps/asg2test \
   apps/asg3	\
   apps/asg4 \
+  apps/asg4test \
 
 # sequentially to avoid same sub-target in sub-make invoked twice
 default:

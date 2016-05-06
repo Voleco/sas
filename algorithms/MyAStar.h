@@ -47,7 +47,7 @@ public:
 	}
 	virtual bool GetPath(environment& e, state& start, state& goal);
 	virtual uint64_t GetNodesExpanded() { return nodesExpanded; }
-	int GetSolutionCost() { return solutionCost; }
+	double GetSolutionCost() { return solutionCost; }
 	//std::vector<action> GetActionSequence();
 protected:
 	uint64_t nodesExpanded;
@@ -55,7 +55,7 @@ protected:
 	//openList is acctually a min heap
 	MyBinaryHeap<StateInfo, uint64_t, StateInfoLess> openList;
 	std::unordered_set<uint64_t> closedList;
-	int solutionCost;
+	double solutionCost;
 };
 
 
@@ -85,17 +85,23 @@ bool MyAStar<state, action, environment, heuristic>::GetPath(environment& e, sta
 
 		state successor;
 		e.GetStateFromRank(successor, next);
+
+		//std::cout << "\n***********exbanding*****************\nstate: " << successor;
+		//std::cout << "rank" << next << "\n";
+		//std::cout << "info: " << info << "\n";
 		//we can do solution detection here, as DSD
 		if (successor == goal)
 		{
 			solutionCost = info.gcost;
 			return true;
 		}
-		//std::cout << "\n***********exbanding*****************\nstate: " << successor;
-		//std::cout << "rank" << next << "\n";
-		//std::cout << "info: " << info<<"\n";
+
 		std::vector<action> actions;
 		e.GetActions(successor, actions);
+		//std::cout << "actions\n";
+		//for (int i = 0; i < actions.size();i++)
+		//	std::cout << actions[i];
+		//std::cout << "\n";
 		for (int i = 0; i < actions.size(); i++)
 		{
 			//state successor(s);
