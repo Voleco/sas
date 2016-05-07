@@ -2,6 +2,7 @@
 #include <iostream>
 #include <vector>
 #include <time.h>
+#include <string>
 #include <cstring>
 #include <fstream>
 #include "MyInefficientAStar.h"
@@ -42,11 +43,39 @@ int main(int argc,char** argv)
 			return 1;
 		}
 
-		Map2DState start(atoi(argv[2]), atoi(argv[3]));
-		Map2DState goal(atoi(argv[4]), atoi(argv[5]));
+		std::ifstream fin;
+		fin.open("../../resources/benchmarks/orz301d.map.scen");
+		if (!fin.is_open())
+		{
+			std::cout << "fail to load benchmark file: " << "../../resources/benchmarks/orz301d.map.scen" << "\n";
+			return 1;
+		}
+
+		std::string str;
+		fin >> str;
+		fin >> str;
+		std::vector<int> startx, starty, goalx, goaly;
+		std::vector<double> expectedCost;
+		while (!fin.eof())
+		{
+			fin >> str;
+			fin >> str;
+			fin >> str;
+			fin >> str;
+
+			fin >> str;
+			startx.push_back(std::stoi(str));
+			fin >> str;
+			starty.push_back(std::stoi(str));
+			fin >> str;
+			goalx.push_back(std::stoi(str));
+			fin >> str;
+			goaly.push_back(std::stoi(str));
+			fin >> str;
+			expectedCost.push_back(std::stod(str));
+		}
 
 		OctileDistanceHeuristic* odh = new OctileDistanceHeuristic();
-		odh->SetGoal(goal);
 
 		MyAStar<Map2DState, Map2DAction, Map2D, OctileDistanceHeuristic>
 			*astar1;
@@ -56,10 +85,14 @@ int main(int argc,char** argv)
 		clock_t clockTicksTaken;
 		double timeInSeconds;
 
-		int low = 1;
-		int high = 1;
-		for (int i = low - 1; i < high; i++)
+		double solutionCost;
+		for (int i = 0; i < startx.size(); i++)
 		{
+			Map2DState start(startx[i], starty[i]);
+			Map2DState goal(goalx[i], goaly[i]);
+
+			odh->SetGoal(goal);
+
 			astar1 = new MyAStar<Map2DState, Map2DAction, Map2D, OctileDistanceHeuristic>
 				(*odh);
 
@@ -74,13 +107,23 @@ int main(int argc,char** argv)
 				std::cout << "A* w/ MD found a path!\n";
 				std::cout << "nodes expanded:\tPath length:\ttime spent(s)\n";
 				std::cout << astar1->GetNodesExpanded() << "\t";
-				std::cout << astar1->GetSolutionCost() << "\t";
+				solutionCost = astar1->GetSolutionCost();
+				std::cout << solutionCost << "\t";
 			}
+
 			delete astar1;
+
 			endTime = clock();
 			clockTicksTaken = endTime - startTime;
 			timeInSeconds = clockTicksTaken / (double)CLOCKS_PER_SEC;
 			std::cout << timeInSeconds << "\n";
+
+			if (solutionCost - expectedCost[i] > 0.01 || solutionCost - expectedCost[i] < -0.01)
+			{
+				std::cout << "error solution cost:\t expected cost\n";
+				std::cout << solutionCost<<"\t" <<expectedCost[i] <<"\n";
+				return 1;
+			}
 		}
 	}
 

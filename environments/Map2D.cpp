@@ -11,6 +11,8 @@ Map2D::Map2D(const Map2D & m)
 	}
 }
 
+//accoring to http://web.cs.du.edu/~sturtevant/papers/benchmarks.pdf
+//diagonal moves are allowed only if both related cardinal moves are allowed
 void Map2D::GetActions(Map2DState &nodeID, std::vector<Map2DAction> &actions)
 {
 	actions.resize(0);
@@ -18,25 +20,47 @@ void Map2D::GetActions(Map2DState &nodeID, std::vector<Map2DAction> &actions)
 		return;
 	if (map[nodeID.x * height + nodeID.y] != '.')
 		return;
+
+	bool l = false;
+	bool r = false;
+	bool u = false;
+	bool d = false;
 	if (mapType == OCTILE)
 	{
 		if (nodeID.x + 1 < width && map[(nodeID.x + 1)*height + nodeID.y] == '.')
+		{
 			actions.push_back(tR);
+			r = true;
+		}
 		if (nodeID.x - 1 >= 0 && map[(nodeID.x - 1)*height + nodeID.y] == '.')
+		{
 			actions.push_back(tL);
+			l = true;
+		}
 		if (nodeID.y + 1 < height && map[nodeID.x*height + nodeID.y + 1] == '.')
+		{
 			actions.push_back(tD);
+			d = true;
+		}
 		if (nodeID.y - 1 >= 0 && map[nodeID.x*height + nodeID.y - 1] == '.')
+		{
 			actions.push_back(tU);
-		if (nodeID.x + 1 < width && nodeID.y + 1 < width && map[(nodeID.x + 1)*height + nodeID.y + 1] == '.')
+			u = true;
+		}			
+		if (nodeID.x + 1 < width && d && r
+			&& nodeID.y + 1 < height && map[(nodeID.x + 1)*height + nodeID.y + 1] == '.')
 			actions.push_back(tDR);
-		if (nodeID.x + 1 < width && nodeID.y - 1 >= 0 && map[(nodeID.x + 1)*height + nodeID.y - 1] == '.')
+		if (nodeID.x + 1 < width && u && r
+			&& nodeID.y - 1 >= 0 && map[(nodeID.x + 1)*height + nodeID.y - 1] == '.')
 			actions.push_back(tUR);
-		if (nodeID.x - 1 >= 0 && nodeID.y + 1 < height && map[(nodeID.x - 1)*height + nodeID.y + 1] == '.')
+		if (nodeID.x - 1 >= 0 && d && l
+			&& nodeID.y + 1 < height && map[(nodeID.x - 1)*height + nodeID.y + 1] == '.')
 			actions.push_back(tDL);
-		if (nodeID.x - 1 >= 0 && nodeID.y - 1 >= 0 && map[(nodeID.x - 1)*height + nodeID.y - 1] == '.')
+		if (nodeID.x - 1 >= 0 && u && l
+			&& nodeID.y - 1 >= 0 && map[(nodeID.x - 1)*height + nodeID.y - 1] == '.')
 			actions.push_back(tUL);
 	}
+	//The following code should not be used in this experiment
 	if (mapType == FOUR_WAY)
 	{
 		if (nodeID.x + 1 < width && map[(nodeID.x + 1)*height + nodeID.y] == '.')

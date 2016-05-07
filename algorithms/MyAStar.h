@@ -100,7 +100,7 @@ bool MyAStar<state, action, environment, heuristic>::GetPath(environment& e, sta
 		e.GetActions(successor, actions);
 		//std::cout << "actions\n";
 		//for (int i = 0; i < actions.size();i++)
-		//	std::cout << actions[i];
+		//	std::cout << actions[i]<<" ";
 		//std::cout << "\n";
 		for (int i = 0; i < actions.size(); i++)
 		{
