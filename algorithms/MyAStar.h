@@ -2,6 +2,7 @@
 #ifndef MY_ASTAR_H
 #define MY_ASTAR_H
 
+#include <cfloat>
 #include <vector>
 #include <stack>
 #include <queue>
@@ -41,8 +42,9 @@ template <typename state, typename action, typename environment, typename heuris
 class MyAStar :public MySearchAlgorithm<state, action, environment>
 {
 public:
-	MyAStar(heuristic& h)
-		:MySearchAlgorithm<state, action, environment>(), nodesExpanded(0), heur(h), solutionCost(MINUMUM_F)
+	MyAStar(heuristic& h, bool _consistent=true)
+		:MySearchAlgorithm<state, action, environment>(), 
+		nodesExpanded(0), heur(h), solutionCost(DBL_MAX),consistent(_consistent)
 	{
 	}
 	virtual bool GetPath(environment& e, state& start, state& goal);
@@ -56,6 +58,8 @@ protected:
 	MyBinaryHeap<StateInfo, uint64_t, StateInfoLess> openList;
 	std::unordered_set<uint64_t> closedList;
 	double solutionCost;
+	//a variable specifies whether the heuristic is consistent
+	bool consistent;
 };
 
 
@@ -122,13 +126,15 @@ bool MyAStar<state, action, environment, heuristic>::GetPath(environment& e, sta
 			//std::cout << "succrank: " << succrank<<"\n";
 			if (!openList.IsExist(succrank))
 			{
+				//otherwise this node is expanded. as for consistent heuristic, we can ignore it
+				if (consistent && closedList.find(succrank) != closedList.end())
+					;
 				//this node is ungenerated
-				if (closedList.find(succrank) == closedList.end())
+				else
 				{
 					succinfo.hcost = heur.GetHCost(successor);
 					openList.Insert(succinfo, succrank);
 				}
-				//otherwise this node is expanded. as for consistent heuristic, we can ignore it
 			}
 			//in this case, this state is already on open. We may need to update its gcost 
 			else
