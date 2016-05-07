@@ -216,7 +216,7 @@ int main(int argc,char** argv)
 			goalcp = SlidingTilePuzzleState(goal);
 			if (astar3->GetPath(puzzle, startcp, goalcp))
 			{
-				std::cout << "IDA* w/  max{MD, PDBc-e} found a path!\n";
+				std::cout << "A* w/  max{MD, PDBc-e} found a path!\n";
 				std::cout << "nodes expanded:\tPath length:\ttime spent(s)\n";
 				std::cout << astar3->GetNodesExpanded() << "\t";
 				std::cout << astar3->GetSolutionCost() << "\t";
@@ -286,7 +286,9 @@ int main(int argc,char** argv)
 
 	else
 	{
-		std::cout << "Usage: " << argv[0] << " -i [low] [high] \n";
+		std::cout << "Usage: " << argv[0] << " -i [low] [high] \n"
+			<< argv[0] << " -a <heuristic directory> [low] [high] \n"
+			<< argv[0] << " -amap <start x> <start y> <goal x> <goal y> \n";
 	}
 
 

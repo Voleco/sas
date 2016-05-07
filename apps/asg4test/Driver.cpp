@@ -28,13 +28,8 @@ int main(int argc,char** argv)
 		puzzle.GetStateFromRank(start, rank);
 		std::cout << "retrieved state: " << start << "\n";
 	}
-	else if (argc > 1 && strcmp(argv[1], "-testmap") == 0)
-	{
-		Map2D map;
-		map.LoadMap("../../resources/maps/orz301d.map");
-	}
 
-	else if (argc > 1 && strcmp(argv[1], "-amap") == 0)
+	else if (argc > 1 && strcmp(argv[1], "-amaptest") == 0)
 	{
 		Map2D map;
 		if (!map.LoadMap("../../resources/maps/orz301d.map"))
@@ -104,7 +99,7 @@ int main(int argc,char** argv)
 			startTime = clock();
 			if (astar1->GetPath(map, start, goal))
 			{
-				std::cout << "A* w/ MD found a path!\n";
+				std::cout << "A* w/ ODH found a path!\n";
 				std::cout << "nodes expanded:\tPath length:\ttime spent(s)\n";
 				std::cout << astar1->GetNodesExpanded() << "\t";
 				solutionCost = astar1->GetSolutionCost();
@@ -124,13 +119,15 @@ int main(int argc,char** argv)
 				std::cout << solutionCost<<"\t" <<expectedCost[i] <<"\n";
 				return 1;
 			}
+			else
+				std::cout << "passed!\n";
 		}
 	}
 
 
 	else
 	{
-		std::cout << "Usage: " << argv[0] << " -i [low] [high] \n";
+		std::cout << "Usage: " << argv[0] << " -amaptest \n";
 	}
 
 
