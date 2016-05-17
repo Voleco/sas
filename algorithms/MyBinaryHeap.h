@@ -16,7 +16,8 @@ public:
 	value ExtractMin() { return values[0]; }
 	void DeleteMin();
 	void Insert(const key& k, const value& val);
-	void DecreaseKey(const key& nk,const value& val);
+	void DecreaseKey(const key& nk, const value& val);
+	void IncreaseKey(const key& nk, const value& val);
 	bool Empty() { return size == 0; }
 	//the following methods are specific for search algorithms
 	bool IsExist(const value& val);
@@ -51,6 +52,14 @@ void MyBinaryHeap<key, value, keyLess>::DeleteMin()
 		std::cout << "error in delete\n";
 		std::cout << "indices.size"<< indices.size() <<" size "<<size<<"\n";
 	}
+}
+
+template<typename key, typename value, typename keyLess>
+void MyBinaryHeap<key, value, keyLess>::IncreaseKey(const key& nk, const value& val)
+{
+	std::size_t index = indices[val];
+	keys[index] = nk;
+	heapify(index);
 }
 
 template<typename key, typename value, typename keyLess>

@@ -5,10 +5,12 @@
 #include <string>
 #include <iostream>
 #include <fstream>
+#include <string.h>
 #include "MyEnvironment.h"
 #include "MyHeuristic.h"
 
 #define SQUARE_ROOT_OF2 1.414213562373
+#define AMP_FACTOR 4
 
 class Map2DState
 {
@@ -92,7 +94,7 @@ enum Map2DType {
 class Map2D : public MyEnvironment<Map2DState, Map2DAction>
 {
 public:
-	Map2D():map(0) {  }
+	Map2D():map(NULL) {  }
 	//copy constructor
 	Map2D(const Map2D& s);
 	~Map2D() 
@@ -127,6 +129,31 @@ public:
 	void SetGoal(Map2DState& s) { goal = s; }
 	double GetHCost(Map2DState& s);
 	Map2DState goal;
+};
+
+
+class Map2DDifferentialHeuristic :public MyHeuristic<Map2DState>
+{
+public:
+	Map2DDifferentialHeuristic():img(NULL),width(0),height(0) { }
+	Map2DDifferentialHeuristic(Map2D e):env(e),img(NULL),width(0),height(0) { }
+	~Map2DDifferentialHeuristic() {}
+	void SetGoal(Map2DState& s) { goal = s; }
+	double GetHCost(Map2DState& s);
+
+
+	void BuildPDB();
+
+	bool LoadMap(std::string fileName);
+	void SaveAsBMP(std::string);
+
+protected:
+	Map2D env;
+	Map2DState goal;
+
+	unsigned char *img;
+	int height;
+	int width;
 };
 
 #endif // !MAP2D_H

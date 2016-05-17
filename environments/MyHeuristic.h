@@ -21,6 +21,14 @@ protected:
 	std::vector<MyHeuristic<state>*> heurs;
 };
 
+template <class state>
+class ZeroHeuristic
+{
+public:
+	double GetHCost(state &s) { return 0; }
+};
+
+
 template<class state>
 double MaxHeuristic<state>::GetHCost(state & s)
 {

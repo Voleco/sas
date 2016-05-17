@@ -3,12 +3,14 @@
 Map2D::Map2D(const Map2D & m)
 	:width(m.width),height(m.height),mapType(m.mapType)
 {
-	if (m.map != 0)
+	if (m.map != NULL)
 	{
 		map = new char[width*height];
 		for (int i = 0; i < width*height; i++)
 			map[i] = m.map[i];
 	}
+	else
+		map = NULL;
 }
 
 //accoring to http://web.cs.du.edu/~sturtevant/papers/benchmarks.pdf
@@ -18,7 +20,7 @@ void Map2D::GetActions(Map2DState &nodeID, std::vector<Map2DAction> &actions)
 	actions.resize(0);
 	if (nodeID.x < 0 || nodeID.x >= width || nodeID.y < 0 || nodeID.y >= height)
 		return;
-	if (map[nodeID.x * height + nodeID.y] != '.')
+	if (map[nodeID.y * width + nodeID.x] != '.')
 		return;
 
 	bool l = false;
@@ -27,49 +29,49 @@ void Map2D::GetActions(Map2DState &nodeID, std::vector<Map2DAction> &actions)
 	bool d = false;
 	if (mapType == OCTILE)
 	{
-		if (nodeID.x + 1 < width && map[(nodeID.x + 1)*height + nodeID.y] == '.')
+		if (nodeID.x + 1 < width && map[nodeID.y * width + nodeID.x + 1] == '.')
 		{
 			actions.push_back(tR);
 			r = true;
 		}
-		if (nodeID.x - 1 >= 0 && map[(nodeID.x - 1)*height + nodeID.y] == '.')
+		if (nodeID.x - 1 >= 0 && map[nodeID.y * width + nodeID.x - 1 ] == '.')
 		{
 			actions.push_back(tL);
 			l = true;
 		}
-		if (nodeID.y + 1 < height && map[nodeID.x*height + nodeID.y + 1] == '.')
+		if (nodeID.y + 1 < height && map[(nodeID.y + 1)*width + nodeID.x] == '.')
 		{
 			actions.push_back(tD);
 			d = true;
 		}
-		if (nodeID.y - 1 >= 0 && map[nodeID.x*height + nodeID.y - 1] == '.')
+		if (nodeID.y - 1 >= 0 && map[(nodeID.y - 1)*width + nodeID.x] == '.')
 		{
 			actions.push_back(tU);
 			u = true;
 		}			
-		if (nodeID.x + 1 < width && d && r
-			&& nodeID.y + 1 < height && map[(nodeID.x + 1)*height + nodeID.y + 1] == '.')
+		if ( d && r
+			 && map[(nodeID.y + 1)*width + nodeID.x + 1] == '.')
 			actions.push_back(tDR);
-		if (nodeID.x + 1 < width && u && r
-			&& nodeID.y - 1 >= 0 && map[(nodeID.x + 1)*height + nodeID.y - 1] == '.')
+		if ( u && r
+			 && map[(nodeID.y - 1)*width + nodeID.x + 1] == '.')
 			actions.push_back(tUR);
-		if (nodeID.x - 1 >= 0 && d && l
-			&& nodeID.y + 1 < height && map[(nodeID.x - 1)*height + nodeID.y + 1] == '.')
+		if ( d && l
+			 && map[(nodeID.y + 1)*width + nodeID.x - 1] == '.')
 			actions.push_back(tDL);
-		if (nodeID.x - 1 >= 0 && u && l
-			&& nodeID.y - 1 >= 0 && map[(nodeID.x - 1)*height + nodeID.y - 1] == '.')
+		if ( u && l
+			 && map[(nodeID.y - 1)*width + nodeID.x - 1] == '.')
 			actions.push_back(tUL);
 	}
 	//The following code should not be used in this experiment
 	if (mapType == FOUR_WAY)
 	{
-		if (nodeID.x + 1 < width && map[(nodeID.x + 1)*height + nodeID.y] == '.')
+		if (nodeID.x + 1 < width && map[nodeID.y * width + nodeID.x + 1] == '.')
 			actions.push_back(tR);
-		if (nodeID.x - 1 >= 0 && map[(nodeID.x - 1)*height + nodeID.y] == '.')
+		if (nodeID.x - 1 >= 0 && map[nodeID.y * width + nodeID.x - 1] == '.')
 			actions.push_back(tL);
-		if (nodeID.y + 1 < height && map[nodeID.x*height + nodeID.y + 1] == '.')
+		if (nodeID.y + 1 < height && map[(nodeID.y + 1)*width + nodeID.x] == '.')
 			actions.push_back(tD);
-		if (nodeID.y - 1 >= 0 && map[nodeID.x*height + nodeID.y - 1] == '.')
+		if (nodeID.y - 1 >= 0 && map[(nodeID.y - 1)*width + nodeID.x] == '.')
 			actions.push_back(tU);
 	}
 }
@@ -220,7 +222,7 @@ bool Map2D::LoadMap(std::string fileName)
 		fin.getline(line, width+1);
 		for (int i = 0; i < width; i++)
 		{
-			map[i*height + j] = line[i];
+			map[j*width + i] = line[i];
 		}
 	}
 	return true;
@@ -239,4 +241,126 @@ double OctileDistanceHeuristic::GetHCost(Map2DState& s)
 	{
 		return xdiff*SQUARE_ROOT_OF2 + (ydiff - xdiff);
 	}
+}
+
+bool Map2DDifferentialHeuristic::LoadMap(std::string fileName)
+{
+	if (!env.LoadMap(fileName))
+		return false;
+	width = env.width;
+	height = env.height;
+
+	if (img)
+		delete img;
+	img = new unsigned char [3 * width*height];
+	memset(img, 0, sizeof(img));
+
+	for (int j = 0; j < height; j++)
+	{
+		for (int i = 0; i < width; i++)
+		{
+			std::cout << env.map[j*width + i];
+			if (env.map[(height-1-j)*width + i] == '.')
+			{
+				img[(i + j*width) * 3 + 2] = 255;
+				img[(i + j*width) * 3 + 1] = 255;
+				img[(i + j*width) * 3 + 0] = 255;
+			}
+			else
+			{
+				img[(i + j*width) * 3 + 2] = 255;
+				img[(i + j*width) * 3 + 1] = 0;
+				img[(i + j*width) * 3 + 0] = 0;
+			}
+		}
+		std::cout << "\n";
+	}
+
+	return true;
+}
+
+void Map2DDifferentialHeuristic::SaveAsBMP(std::string fileName)
+{
+	//the file format info referred from
+	//https://en.wikipedia.org/wiki/BMP_file_format
+	unsigned char fileHeader[14] = {
+		'B','M', // BMP file specifiers
+		0,0,0,0, // size in bytes
+		0,0, // app data
+		0,0, // app data
+		40 + 14,0,0,0 // start of data offset
+	};
+	unsigned char DIBHeader[40] = {
+		40,0,0,0, // info hd size
+		0,0,0,0, // width
+		0,0,0,0, // heigth
+		1,0, // number color planes
+		24,0, // bits per pixel
+		0,0,0,0, // compression is none
+		0,0,0,0, // image bits size
+		0xC3,0x03,0,0, // horz resoluition in pixel / m
+		0xC3,0x03,0,0, // vert resolutions (0x03C3 = 96 dpi, 0x0B13 = 72 dpi)
+		0,0,0,0, // #colors in pallete
+		0,0,0,0, // #important colors
+	};
+
+	int w = width * AMP_FACTOR;
+	int h = height * AMP_FACTOR;
+
+	int padSize = (4 - (w * 3) % 4) % 4;
+	int sizeData = w*h * 3 + h * padSize;
+
+	int sizeAll = sizeData + sizeof(fileHeader) + sizeof(DIBHeader);
+
+	fileHeader[2] = (unsigned char)(sizeAll);
+	fileHeader[3] = (unsigned char)(sizeAll >> 8);
+	fileHeader[4] = (unsigned char)(sizeAll >> 16);
+	fileHeader[5] = (unsigned char)(sizeAll >> 24);
+
+	DIBHeader[4] = (unsigned char)(w);
+	DIBHeader[5] = (unsigned char)(w >> 8);
+	DIBHeader[6] = (unsigned char)(w >> 16);
+	DIBHeader[7] = (unsigned char)(w >> 24);
+
+	DIBHeader[8] = (unsigned char)(h);
+	DIBHeader[9] = (unsigned char)(h >> 8);
+	DIBHeader[10] = (unsigned char)(h >> 16);
+	DIBHeader[11] = (unsigned char)(h >> 24);
+
+
+	DIBHeader[20] = (unsigned char)(sizeData);
+	DIBHeader[21] = (unsigned char)(sizeData >> 8);
+	DIBHeader[22] = (unsigned char)(sizeData >> 16);
+	DIBHeader[23] = (unsigned char)(sizeData >> 24);
+
+	FILE *f = fopen(fileName.c_str(), "w+b");
+	fwrite(fileHeader, 1, 14, f);
+	fwrite(DIBHeader, 1, 40, f);
+
+	unsigned char bmppad[3] = { 0,0,0 };
+
+	for (int j = 0; j<height; j++)
+	{
+		for (int outer = 0; outer < AMP_FACTOR; outer++)
+		{
+			for (int i = 0; i < width; i++)
+			{
+				for (int inner = 0; inner < AMP_FACTOR; inner++)
+					fwrite(img + ((j*width + i) * 3), 3, 1, f);
+			}
+			fwrite(bmppad, 1, padSize, f);
+		}
+	}
+	fclose(f);
+}
+
+double Map2DDifferentialHeuristic::GetHCost(Map2DState& s)
+{
+	return 0;
+}
+
+
+void Map2DDifferentialHeuristic::BuildPDB()
+{
+
 }
