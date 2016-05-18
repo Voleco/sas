@@ -268,7 +268,7 @@ bool Map2DDifferentialHeuristic::LoadMap(std::string fileName)
 			}
 			else
 			{
-				img[(i + j*width) * 3 + 2] = 255;
+				img[(i + j*width) * 3 + 2] = 0;
 				img[(i + j*width) * 3 + 1] = 0;
 				img[(i + j*width) * 3 + 0] = 0;
 			}
@@ -279,7 +279,7 @@ bool Map2DDifferentialHeuristic::LoadMap(std::string fileName)
 	return true;
 }
 
-void Map2DDifferentialHeuristic::SaveAsBMP(std::string fileName)
+void Map2DDifferentialHeuristic::SaveAsBMP(std::string fileName, int index)
 {
 	//the file format info referred from
 	//https://en.wikipedia.org/wiki/BMP_file_format
@@ -333,6 +333,7 @@ void Map2DDifferentialHeuristic::SaveAsBMP(std::string fileName)
 	DIBHeader[22] = (unsigned char)(sizeData >> 16);
 	DIBHeader[23] = (unsigned char)(sizeData >> 24);
 
+	fileName += "_pivot_" + std::to_string(index) + ".bmp";
 	FILE *f = fopen(fileName.c_str(), "w+b");
 	fwrite(fileHeader, 1, 14, f);
 	fwrite(DIBHeader, 1, 40, f);
@@ -346,7 +347,13 @@ void Map2DDifferentialHeuristic::SaveAsBMP(std::string fileName)
 			for (int i = 0; i < width; i++)
 			{
 				for (int inner = 0; inner < AMP_FACTOR; inner++)
-					fwrite(img + ((j*width + i) * 3), 3, 1, f);
+				{
+					if(index == -1)
+						fwrite(img + ((j*width + i) * 3), 3, 1, f);
+					else
+						fwrite(imgs[index] + ((j*width + i) * 3), 3, 1, f);
+				}
+					
 			}
 			fwrite(bmppad, 1, padSize, f);
 		}
@@ -360,7 +367,122 @@ double Map2DDifferentialHeuristic::GetHCost(Map2DState& s)
 }
 
 
-void Map2DDifferentialHeuristic::BuildPDB()
+void Map2DDifferentialHeuristic::BuildPDBs()
 {
+	for (int i = 0; i < built.size(); i++)
+	{
+		if (!built[i])
+		{
+			BuildPDB(i);
+			built[i] = true;
+		}
+	}
+}
 
+void Map2DDifferentialHeuristic::BuildPDB(int index)
+{
+	Map2DState start = pivots[index];
+	if (heurTable[index])
+		delete heurTable[index];
+	heurTable[index] = new double[width*height];
+	for (int i = 0; i < width*height; i++)
+		heurTable[index][i] = -1.0;
+
+	MyBinaryHeap<StateInfo, uint64_t, StateInfoLess> openList;
+	std::unordered_set<uint64_t> closedList;
+
+	StateInfo info;
+	info.gcost = 0;
+	info.hcost = 0;
+	uint64_t startRank;
+	env.GetRankFromState(start, startRank);
+	openList.Insert(info, startRank);
+	//openList.
+	uint64_t next;
+	while (!openList.Empty())
+	{
+		//choose best node from openlist;
+		next = openList.ExtractMin();
+		info = openList.MinKey();
+		//remove it from open, add it to closed
+		openList.DeleteMin();
+		closedList.insert(next);
+
+		heurTable[index][next] = info.gcost;
+
+		Map2DState successor;
+		env.GetStateFromRank(successor, next);
+
+
+		std::vector<Map2DAction> actions;
+		env.GetActions(successor, actions);
+
+		for (int i = 0; i < actions.size(); i++)
+		{
+			env.ApplyAction(successor, actions[i]);
+			double edgeCost = env.GetActionCost(actions[i]);
+
+			StateInfo succinfo;
+			succinfo.gcost = info.gcost + edgeCost;
+			succinfo.hcost = 0;
+			//succinfo.hcost = heur.GetHCost(successor);
+			uint64_t succrank;
+			env.GetRankFromState(successor, succrank);
+
+			if (!openList.IsExist(succrank))
+			{
+				//otherwise this node is expanded. as for consistent heuristic, we can ignore it
+				if (closedList.find(succrank) != closedList.end())
+					;
+				//this node is ungenerated
+				else
+					openList.Insert(succinfo, succrank);
+			}
+			//in this case, this state is already on open. We may need to update its gcost 
+			else
+			{
+				StateInfo preinfo = openList.GetKey(succrank);
+				if (preinfo.gcost > succinfo.gcost)
+					openList.DecreaseKey(succinfo, succrank);
+			}
+
+			env.UndoAction(successor, actions[i]);
+		}
+	}
+
+	double sf = 255/heurTable[index][next];
+	std::cout << "sf" << sf;
+
+	if (imgs[index])
+		delete imgs[index];
+	imgs[index] = new unsigned char[3 * width*height];
+	memset(imgs[index], 0, sizeof(imgs[index]));
+
+	
+
+	for (int j = 0; j < height; j++)
+	{
+		for (int i = 0; i < width; i++)
+		{
+			if (heurTable[index][i + (height - 1 - j)*width] == 0)
+			{
+				imgs[index][(i + j*width) * 3 + 2] = 0;
+				imgs[index][(i + j*width) * 3 + 1] = 255;
+				imgs[index][(i + j*width) * 3 + 0] = 0;
+			}
+			else if (heurTable[index][i+(height-1-j)*width]==-1)
+			{
+				imgs[index][(i + j*width) * 3 + 2] = 0;
+				imgs[index][(i + j*width) * 3 + 1] = 0;
+				imgs[index][(i + j*width) * 3 + 0] = 0;
+			}
+			else
+			{
+				int diff = heurTable[index][i + (height-1-j)*width] * sf;
+				imgs[index][(i + j*width) * 3 + 2] = 255 - (diff);
+				imgs[index][(i + j*width) * 3 + 1] = 0;
+				imgs[index][(i + j*width) * 3 + 0] = 0+ (diff);
+			}
+		}
+	}
 }

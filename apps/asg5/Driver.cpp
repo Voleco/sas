@@ -14,10 +14,20 @@ int main(int argc,char** argv)
 	{
 		Map2D map;
 		Map2DDifferentialHeuristic heur(map);
-		heur.LoadMap("../../resources/maps/orz301d.map");
-		heur.SaveAsBMP("../../resources/maps/orz301d.bmp");
+		heur.LoadMap("../../resources/maps/lak303d.map");
+		heur.SaveAsBMP("../../resources/maps/lak303d.bmp",-1);
 	}
 
+	else if (argc > 1 && strcmp(argv[1], "-test2") == 0)
+	{
+		Map2D map;
+		Map2DDifferentialHeuristic heur(map);
+		heur.LoadMap("../../resources/maps/lak303d.map");
+		Map2DState s(60,60);
+		heur.AddPivot(s);
+		heur.BuildPDBs();
+		heur.SaveAsBMP("../../resources/maps/lak303d.bmp",0);
+	}
 
 	else
 	{

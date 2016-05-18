@@ -8,6 +8,7 @@
 #include <string.h>
 #include "MyEnvironment.h"
 #include "MyHeuristic.h"
+#include "MyAstar.h"
 
 #define SQUARE_ROOT_OF2 1.414213562373
 #define AMP_FACTOR 4
@@ -141,11 +142,12 @@ public:
 	void SetGoal(Map2DState& s) { goal = s; }
 	double GetHCost(Map2DState& s);
 
-
-	void BuildPDB();
+	void AddPivot(Map2DState& s) 	{ pivots.push_back(s); built.push_back(false);	heurTable.push_back(NULL); imgs.push_back(NULL);	}
+	void BuildPDBs();
+	void BuildPDB(int i);
 
 	bool LoadMap(std::string fileName);
-	void SaveAsBMP(std::string);
+	void SaveAsBMP(std::string fileName,int index);
 
 protected:
 	Map2D env;
@@ -154,6 +156,10 @@ protected:
 	unsigned char *img;
 	int height;
 	int width;
+	std::vector<Map2DState> pivots;
+	std::vector<bool> built;
+	std::vector<double*> heurTable;
+	std::vector<unsigned char *> imgs;
 };
 
 #endif // !MAP2D_H
