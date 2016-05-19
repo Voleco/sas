@@ -6,6 +6,7 @@
 #include <iostream>
 #include <fstream>
 #include <string.h>
+#include <math.h>
 #include "MyEnvironment.h"
 #include "MyHeuristic.h"
 #include "MyAstar.h"
@@ -142,20 +143,25 @@ public:
 	void SetGoal(Map2DState& s) { goal = s; }
 	double GetHCost(Map2DState& s);
 
-	void AddPivot(Map2DState& s) 	{ pivots.push_back(s); built.push_back(false);	heurTable.push_back(NULL); imgs.push_back(NULL);	}
+	void AddPivot(Map2DState& s);
+
+	Map2DState GetFarthestPivot();
+	
 	void BuildPDBs();
 	void BuildPDB(int i);
 
 	bool LoadMap(std::string fileName);
 	void SaveAsBMP(std::string fileName,int index);
 
+	int height;
+	int width;
+
 protected:
 	Map2D env;
 	Map2DState goal;
 
 	unsigned char *img;
-	int height;
-	int width;
+
 	std::vector<Map2DState> pivots;
 	std::vector<bool> built;
 	std::vector<double*> heurTable;

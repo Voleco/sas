@@ -259,7 +259,7 @@ bool Map2DDifferentialHeuristic::LoadMap(std::string fileName)
 	{
 		for (int i = 0; i < width; i++)
 		{
-			std::cout << env.map[j*width + i];
+			//std::cout << env.map[j*width + i];
 			if (env.map[(height-1-j)*width + i] == '.')
 			{
 				img[(i + j*width) * 3 + 2] = 255;
@@ -273,7 +273,7 @@ bool Map2DDifferentialHeuristic::LoadMap(std::string fileName)
 				img[(i + j*width) * 3 + 0] = 0;
 			}
 		}
-		std::cout << "\n";
+		//std::cout << "\n";
 	}
 
 	return true;
@@ -363,7 +363,32 @@ void Map2DDifferentialHeuristic::SaveAsBMP(std::string fileName, int index)
 
 double Map2DDifferentialHeuristic::GetHCost(Map2DState& s)
 {
-	return 0;
+	double value = 0;
+	uint64_t stateRank;
+	uint64_t goalRank;
+	env.GetRankFromState(s, stateRank);
+	env.GetRankFromState(goal, goalRank);
+	for (int i = 0; i < heurTable.size(); i++)
+	{
+		if (built[i])
+		{
+			if (fabs(heurTable[i][stateRank] - heurTable[i][goalRank])>value)
+				value = fabs(heurTable[i][stateRank] - heurTable[i][goalRank]);
+		}
+	}
+	return value;
+}
+
+void Map2DDifferentialHeuristic::AddPivot(Map2DState& s)
+{
+	pivots.push_back(s);
+	built.push_back(false);	
+	heurTable.push_back(NULL); 
+	imgs.push_back(NULL);	
+
+	img[(s.x + (height - 1 - s.y)*width) * 3 + 2] = 255;
+	img[(s.x + (height - 1 - s.y)*width) * 3 + 1] = 0;
+	img[(s.x + (height - 1 - s.y)*width) * 3 + 0] = 0;
 }
 
 
@@ -451,7 +476,7 @@ void Map2DDifferentialHeuristic::BuildPDB(int index)
 	}
 
 	double sf = 255/heurTable[index][next];
-	std::cout << "sf" << sf;
+	//std::cout << "sf" << sf;
 
 	if (imgs[index])
 		delete imgs[index];
@@ -464,13 +489,7 @@ void Map2DDifferentialHeuristic::BuildPDB(int index)
 	{
 		for (int i = 0; i < width; i++)
 		{
-			if (heurTable[index][i + (height - 1 - j)*width] == 0)
-			{
-				imgs[index][(i + j*width) * 3 + 2] = 0;
-				imgs[index][(i + j*width) * 3 + 1] = 255;
-				imgs[index][(i + j*width) * 3 + 0] = 0;
-			}
-			else if (heurTable[index][i+(height-1-j)*width]==-1)
+			if (heurTable[index][i+(height-1-j)*width]==-1)
 			{
 				imgs[index][(i + j*width) * 3 + 2] = 0;
 				imgs[index][(i + j*width) * 3 + 1] = 0;
@@ -485,4 +504,89 @@ void Map2DDifferentialHeuristic::BuildPDB(int index)
 			}
 		}
 	}
+	//mark the pivot with green color
+	int i = startRank % width;
+	int j = startRank / width;
+	imgs[index][(i + (height - 1 - j)*width) * 3 + 2] = 0;
+	imgs[index][(i + (height - 1 - j)*width) * 3 + 1] = 255;
+	imgs[index][(i + (height - 1 - j)*width) * 3 + 0] = 0;
+	//i = next % width;
+	//j = next / width;
+	//imgs[index][(i + (height - 1 - j)*width) * 3 + 2] = 255;
+	//imgs[index][(i + (height - 1 - j)*width) * 3 + 1] = 255;
+	//imgs[index][(i + (height - 1 - j)*width) * 3 + 0] = 0;
+}
+
+Map2DState Map2DDifferentialHeuristic::GetFarthestPivot()
+{
+	Map2DState res(-1, -1);
+	if (pivots.size() < 1)
+		return res;
+
+	MyBinaryHeap<StateInfo, uint64_t, StateInfoLess> openList;
+	std::unordered_set<uint64_t> closedList;
+
+	StateInfo info;
+	info.gcost = 0;
+	info.hcost = 0;
+	uint64_t startRank;
+	for (int i = 0; i < pivots.size(); i++)
+	{
+		env.GetRankFromState(pivots[i], startRank);
+		openList.Insert(info, startRank);
+	}
+
+	//openList.
+	uint64_t next;
+	while (!openList.Empty())
+	{
+		//choose best node from openlist;
+		next = openList.ExtractMin();
+		info = openList.MinKey();
+		//remove it from open, add it to closed
+		openList.DeleteMin();
+		closedList.insert(next);
+
+		Map2DState successor;
+		env.GetStateFromRank(successor, next);
+
+		std::vector<Map2DAction> actions;
+		env.GetActions(successor, actions);
+
+		for (int i = 0; i < actions.size(); i++)
+		{
+			env.ApplyAction(successor, actions[i]);
+			double edgeCost = env.GetActionCost(actions[i]);
+
+			StateInfo succinfo;
+			succinfo.gcost = info.gcost + edgeCost;
+			succinfo.hcost = 0;
+			//succinfo.hcost = heur.GetHCost(successor);
+			uint64_t succrank;
+			env.GetRankFromState(successor, succrank);
+
+			if (!openList.IsExist(succrank))
+			{
+				//otherwise this node is expanded. as for consistent heuristic, we can ignore it
+				if (closedList.find(succrank) != closedList.end())
+					;
+				//this node is ungenerated
+				else
+					openList.Insert(succinfo, succrank);
+			}
+			//in this case, this state is already on open. We may need to update its gcost 
+			else
+			{
+				StateInfo preinfo = openList.GetKey(succrank);
+				if (preinfo.gcost > succinfo.gcost)
+					openList.DecreaseKey(succinfo, succrank);
+			}
+
+			env.UndoAction(successor, actions[i]);
+		}
+	}
+
+	env.GetStateFromRank(res, next);
+
+	return res;
 }
