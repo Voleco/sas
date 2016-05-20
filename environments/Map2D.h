@@ -9,7 +9,7 @@
 #include <math.h>
 #include "MyEnvironment.h"
 #include "MyHeuristic.h"
-#include "MyAstar.h"
+#include "MyAStar.h"
 
 #define SQUARE_ROOT_OF2 1.414213562373
 #define AMP_FACTOR 4
