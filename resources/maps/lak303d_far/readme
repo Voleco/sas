@@ -1,0 +1,7 @@
+This directory stores the hcost distribution of k farthest pivots
+
+pivots are marked with green color
+
+red means low hcost
+
+blue means high hcost
