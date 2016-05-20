@@ -391,6 +391,20 @@ void Map2DDifferentialHeuristic::AddPivot(Map2DState& s)
 	img[(s.x + (height - 1 - s.y)*width) * 3 + 0] = 0;
 }
 
+void Map2DDifferentialHeuristic::ChangePivot(Map2DState & s, int index)
+{
+	img[(pivots[index].x + (height - 1 - pivots[index].y)*width) * 3 + 2] = 255;
+	img[(pivots[index].x + (height - 1 - pivots[index].y)*width) * 3 + 1] = 255;
+	img[(pivots[index].x + (height - 1 - pivots[index].y)*width) * 3 + 0] = 255;
+
+	pivots[index] = s;
+	built[index] = false;
+
+	img[(s.x + (height - 1 - s.y)*width) * 3 + 2] = 255;
+	img[(s.x + (height - 1 - s.y)*width) * 3 + 1] = 0;
+	img[(s.x + (height - 1 - s.y)*width) * 3 + 0] = 0;
+}
+
 
 void Map2DDifferentialHeuristic::BuildPDBs()
 {

@@ -14,10 +14,11 @@ template <class state>
 class MaxHeuristic
 {
 public:
+	MaxHeuristic() {}
 	MaxHeuristic(std::vector<MyHeuristic<state>*> h) :heurs(h) {}
+	~MaxHeuristic() {}
 	double GetHCost(state &s);
 
-protected:
 	std::vector<MyHeuristic<state>*> heurs;
 };
 

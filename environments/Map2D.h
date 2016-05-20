@@ -144,6 +144,7 @@ public:
 	double GetHCost(Map2DState& s);
 
 	void AddPivot(Map2DState& s);
+	void ChangePivot(Map2DState& s, int index);
 
 	Map2DState GetFarthestPivot();
 	
