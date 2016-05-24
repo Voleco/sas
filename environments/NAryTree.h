@@ -21,6 +21,7 @@ public:
 	void ApplyAction(NAryTreeState &s, NAryTreeAction a);
 	void UndoAction(NAryTreeState &s, NAryTreeAction a);
 	NAryTreeAction GetInvertAction(const NAryTreeAction& a) { return -1; };
+	double GetActionCost(const NAryTreeAction& a) { return 1; }
 	unsigned int GetDepth(NAryTreeState& s);
 	unsigned int GetSolutionDepthUpperBound(NAryTreeState& s, NAryTreeState& g);
 private:
