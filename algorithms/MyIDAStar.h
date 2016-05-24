@@ -19,6 +19,7 @@ public:
 	virtual bool GetPath(environment& e, state& start, state& goal);
 	bool GetPathWithinF(environment& e, state& start, state& goal, double f,double gcost);
 	virtual uint64_t GetNodesExpanded() { return nodesExpanded; }
+	double GetSolutionCost() { return solutionCost; }
 	std::vector<action> GetActionSequence();
 protected:
 	uint64_t nodesExpanded;
@@ -26,13 +27,14 @@ protected:
 	heuristic heur;
 	double nextF;
 	std::stack<action> actionSequence;
-
+	double solutionCost;
 };
 
 
 template <typename state, typename action, typename environment, typename heuristic>
 bool MyIDAStar<state, action, environment, heuristic>::GetPath(environment& e, state& start, state& goal)
 {
+	solutionCost = maxFAllowed;
 	nextF = -1;
 	while(!actionSequence.empty())
 		actionSequence.pop();
@@ -63,7 +65,11 @@ bool MyIDAStar<state, action, environment, heuristic>::GetPathWithinF(environmen
 	}
 	nodesExpanded++;
 	if (start == goal)
+	{
+		solutionCost = gcost;
 		return true;
+	}
+		
 	std::vector<action> actions;
 	e.GetActions(start, actions);
 	for (int i = 0; i < actions.size(); i++)
