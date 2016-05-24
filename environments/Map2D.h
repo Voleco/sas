@@ -130,6 +130,7 @@ public:
 	~OctileDistanceHeuristic() {}
 	void SetGoal(Map2DState& s) { goal = s; }
 	double GetHCost(Map2DState& s);
+	double GetHCost(Map2DState& s1, Map2DState& s2);
 	Map2DState goal;
 };
 
@@ -142,6 +143,7 @@ public:
 	~Map2DDifferentialHeuristic() {}
 	void SetGoal(Map2DState& s) { goal = s; }
 	double GetHCost(Map2DState& s);
+	double GetHCost(Map2DState& s1, Map2DState& s2);
 
 	void AddPivot(Map2DState& s);
 	void ChangePivot(Map2DState& s, int index);

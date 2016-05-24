@@ -162,6 +162,7 @@ public:
 	~ManhattanDistanceHeuristic() {}
 	void SetGoal(SlidingTilePuzzleState& s) { goal = s; }
 	double GetHCost(SlidingTilePuzzleState& s);
+	double GetHCost(SlidingTilePuzzleState& s1, SlidingTilePuzzleState& s2);
 	SlidingTilePuzzleState goal;
 };
 

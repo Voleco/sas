@@ -243,6 +243,21 @@ double OctileDistanceHeuristic::GetHCost(Map2DState& s)
 	}
 }
 
+double OctileDistanceHeuristic::GetHCost(Map2DState& s1, Map2DState& s2)
+{
+	int xdiff = abs(s1.x - s2.x);
+	int ydiff = abs(s1.y - s2.y);
+
+	if (xdiff > ydiff)
+	{
+		return ydiff*SQUARE_ROOT_OF2 + (xdiff - ydiff);
+	}
+	else
+	{
+		return xdiff*SQUARE_ROOT_OF2 + (ydiff - xdiff);
+	}
+}
+
 bool Map2DDifferentialHeuristic::LoadMap(std::string fileName)
 {
 	if (!env.LoadMap(fileName))
@@ -368,6 +383,24 @@ double Map2DDifferentialHeuristic::GetHCost(Map2DState& s)
 	uint64_t goalRank;
 	env.GetRankFromState(s, stateRank);
 	env.GetRankFromState(goal, goalRank);
+	for (int i = 0; i < heurTable.size(); i++)
+	{
+		if (built[i])
+		{
+			if (fabs(heurTable[i][stateRank] - heurTable[i][goalRank])>value)
+				value = fabs(heurTable[i][stateRank] - heurTable[i][goalRank]);
+		}
+	}
+	return value;
+}
+
+double Map2DDifferentialHeuristic::GetHCost(Map2DState& s1, Map2DState& s2)
+{
+	double value = 0;
+	uint64_t stateRank;
+	uint64_t goalRank;
+	env.GetRankFromState(s1, stateRank);
+	env.GetRankFromState(s2, goalRank);
 	for (int i = 0; i < heurTable.size(); i++)
 	{
 		if (built[i])

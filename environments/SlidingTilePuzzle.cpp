@@ -27,6 +27,29 @@ double ManhattanDistanceHeuristic::GetHCost(SlidingTilePuzzleState& s)
 	return hcost;
 }
 
+double ManhattanDistanceHeuristic::GetHCost(SlidingTilePuzzleState& s1, SlidingTilePuzzleState& s2)
+{
+	double hcost = 0;
+	int xdiff = 0;
+	int ydiff = 0;
+	int size = s1.puzzle.size();
+	for (int i = 0; i < size; i++)
+	{
+		for (int j = 0; j < size; j++)
+		{
+			if (s2.puzzle[j] == s1.puzzle[i] && s2.puzzle[j] != 0)
+			{
+				ydiff = j / s1.width > i / s1.width ? (j / s1.width - i / s1.width) : (i / s1.width - j / s1.width);
+				xdiff = j%s1.width > i%s1.width ? (j%s1.width - i%s1.width) : (i%s1.width - j%s1.width);
+				hcost += xdiff + ydiff;
+				break;
+			}
+		}
+
+	}
+	return hcost;
+}
+
 void SlidingTilePuzzle::GetActions(SlidingTilePuzzleState& nodeID, std::vector<SlidingTilePuzzleAction> &actions)
 {
 	actions.resize(0);
