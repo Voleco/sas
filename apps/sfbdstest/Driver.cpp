@@ -114,6 +114,7 @@ int main(int argc,char** argv)
 		{
 			startTime = clock();
 			GetSildingTileInstance(i, start);
+			goal.Reset();
 			sfbds = new MySFBDS<SlidingTilePuzzleState, SlidingTilePuzzleAction, SlidingTilePuzzle, ManhattanDistanceHeuristic>(heur,heur,BF, 500.0);
 			std::cout << "********************************\n"
 				<< "Puzzle " << i + 1 << " of 100\n"
