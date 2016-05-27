@@ -149,6 +149,74 @@ int main(int argc,char** argv)
 		}
 
 	}
+	
+	else if (argc > 1 && strcmp(argv[1], "-jil1") == 0)
+	{
+		bool showPath = false;
+		int low = 1;
+		int high = 100;
+		if (argc > 3)
+		{
+			low = atoi(argv[2]);
+			high = atoi(argv[3]);
+		}
+		if (argc > 4 && strcmp(argv[4], "-showpath") == 0)
+			showPath = true;
+
+		SlidingTilePuzzle puzzle(4, 4);
+		SlidingTilePuzzleState start(4, 4);
+		SlidingTilePuzzleState goal(4, 4);
+		ManhattanDistanceHeuristic heur;
+		//heur.SetGoal(goal);
+
+
+		MySFBDS<SlidingTilePuzzleState, SlidingTilePuzzleAction, SlidingTilePuzzle, ManhattanDistanceHeuristic>
+			*sfbds;
+
+		clock_t startTime;
+		clock_t endTime;
+		clock_t clockTicksTaken;
+		double timeInSeconds;
+		//int i = atoi(argv[1]);
+		for (int i = low - 1; i < high; i++)
+		{
+			startTime = clock();
+			GetSildingTileInstance(i, start);
+			goal.Reset();
+			sfbds = new MySFBDS<SlidingTilePuzzleState, SlidingTilePuzzleAction, SlidingTilePuzzle, ManhattanDistanceHeuristic>(heur, heur, JIL1, 500.0);
+			std::cout << "********************************\n"
+				<< "Puzzle " << i + 1 << " of 100\n"
+				<< "start: " << start
+				<< "goal: " << goal << "\n";
+			std::vector<SlidingTilePuzzleAction> acs;
+			puzzle = SlidingTilePuzzle(4, 4);
+			if (sfbds->GetPath(puzzle, start, goal))
+			{
+				std::cout << "SFBDS with JIL1 Jumping Policy found a path!\n";
+				acs = sfbds->GetActionSequence();
+				std::cout << "Path length: " << acs.size() << "\n";
+				if (showPath)
+				{
+					std::cout << "Path: ";
+					for (int i = 0; i < acs.size(); i++)
+						std::cout << acs[i] << " ";
+					std::cout << "\n";
+				}
+			}
+
+			else
+				std::cout << "SFBDS with JIL1 Jumping Policy did not find a path.\n";
+			std::cout << "nodes expanded: " << sfbds->GetNodesExpanded() << "\n";
+			std::cout << "number of jumps: " << sfbds->GetNumOfJumps() << "\n";
+			delete sfbds;
+
+			endTime = clock();
+			clockTicksTaken = endTime - startTime;
+			timeInSeconds = clockTicksTaken / (double)CLOCKS_PER_SEC;
+			std::cout << "time spent: " << timeInSeconds << " seconds\n";
+		}
+
+	}
 
 
 	else if (argc > 1 && strcmp(argv[1], "-oct") == 0)
@@ -441,7 +509,10 @@ int main(int argc,char** argv)
 	{
 		std::cout << "Usage: " << argv[0] << " -oct \n"
 			<< argv[0] << " -far [k] \n"
-			<< argv[0] << " -ran [k] \n";
+			<< argv[0] << " -ran [k] \n"
+			<< argv[0] << " -stp \n"
+			<< argv[0] << " -bf \n"
+			<< argv[0] << " -jil1 \n";
 	}
 
 

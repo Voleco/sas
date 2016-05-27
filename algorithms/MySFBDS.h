@@ -78,17 +78,14 @@ bool MySFBDS<state, action, environment, heuristic>::GetPathWithinF(environment&
 	double fwhcost = forwardHeur.GetHCost(start,goal);
 	double bwhcost = backwardHeur.GetHCost(goal, start);
 	
-	double fcost = gcost + (fless(fwhcost, bwhcost) ? fwhcost : bwhcost);
+	double fcost = gcost + (fgreater(fwhcost, bwhcost) ? fwhcost : bwhcost);
 	//double fcost = gcost + fwhcost;
 	//std::cout << "fcost: " << fcost << "\n";
 	if (fgreater(fcost, f))
-	//if (fcost > f)
 	{
 		if (fequal(nextF,f))
-		//if (nextF== f)
 			nextF = fcost;
 		else if (fgreater(nextF,f) && fless(fcost, nextF))
-		//else if (nextF> f && fcost< nextF)
 			nextF = fcost;
 
 		return false;
@@ -97,15 +94,46 @@ bool MySFBDS<state, action, environment, heuristic>::GetPathWithinF(environment&
 	if (start == goal)
 		return true;
 	//determine the direction to expand
-	int dir = 0;
+	int dir = direction;
 	std::vector<action> actions;
 	int fbf;
 	int bbf;
+	double fmaxh=0;
+	double bmaxh=0;
 	switch (policy)
 	{
 	case JIL0:
+		if (fgreater(fwhcost, bwhcost))
+			dir = 0;
+		if (fless(fwhcost, bwhcost))
+			dir = 1;
 		break;
 	case JIL1:
+		e.GetActions(start, actions);
+		for (int i = 0; i < actions.size(); i++)
+		{
+			e.ApplyAction(start, actions[i]);
+
+			if (fgreater(forwardHeur.GetHCost(start, goal), fmaxh))
+				fmaxh = forwardHeur.GetHCost(start, goal);
+
+			e.UndoAction(start, actions[i]);
+		}
+		e.GetActions(goal, actions);
+		for (int i = 0; i < actions.size(); i++)
+		{
+			e.ApplyAction(goal, actions[i]);
+
+			if (fgreater(backwardHeur.GetHCost(goal, start), bmaxh))
+				bmaxh = backwardHeur.GetHCost(goal, start);
+
+			e.UndoAction(goal, actions[i]);
+		}
+	
+		if (fgreater(fmaxh,bmaxh))
+			dir = 0;
+		if (fless(fmaxh, bmaxh))
+			dir = 1;
 		break;
 	case JIL2:
 		break;
@@ -114,6 +142,8 @@ bool MySFBDS<state, action, environment, heuristic>::GetPathWithinF(environment&
 		fbf = actions.size();
 		e.GetActions(goal, actions);
 		bbf = actions.size();
+		if (bbf > fbf)
+			dir = 0;
 		if (bbf < fbf)
 			dir = 1;
 		break;
